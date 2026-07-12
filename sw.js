@@ -1,5 +1,5 @@
 /* RAGE beat maker — offline service worker */
-const CACHE = "rage-beat-v1";
+const CACHE = "rage-beat-v2";
 const ASSETS = [
   "./",
   "./index.html",
@@ -24,6 +24,25 @@ self.addEventListener("activate", (e) => {
 
 self.addEventListener("fetch", (e) => {
   if (e.request.method !== "GET") return;
+  const isDoc = e.request.mode === "navigate" ||
+    (e.request.destination === "document") ||
+    e.request.url.endsWith(".html") || e.request.url.endsWith("/");
+
+  if (isDoc) {
+    // Network-first for the app page so new versions always land.
+    e.respondWith(
+      fetch(e.request)
+        .then((res) => {
+          const copy = res.clone();
+          caches.open(CACHE).then((c) => c.put(e.request, copy)).catch(() => {});
+          return res;
+        })
+        .catch(() => caches.match(e.request).then((r) => r || caches.match("./index.html")))
+    );
+    return;
+  }
+
+  // Cache-first for static assets (icons, manifest).
   e.respondWith(
     caches.match(e.request).then((cached) => {
       if (cached) return cached;
