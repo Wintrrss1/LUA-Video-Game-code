@@ -4,13 +4,12 @@
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
 <meta name="theme-color" content="#0a0a0f" />
-<title>RAGE — Underground Beat Maker</title>
+<title>RAGE AI — Beat Generator</title>
 
-<!-- iOS PWA / add-to-home-screen -->
 <meta name="apple-mobile-web-app-capable" content="yes" />
 <meta name="mobile-web-app-capable" content="yes" />
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="apple-mobile-web-app-title" content="RAGE" />
+<meta name="apple-mobile-web-app-title" content="RAGE AI" />
 <link rel="manifest" href="manifest.webmanifest" />
 <link rel="apple-touch-icon" href="icon-180.png" />
 <link rel="icon" href="icon.svg" type="image/svg+xml" />
@@ -19,849 +18,369 @@
   :root{
     --bg:#08080c; --panel:#111119; --panel2:#171722; --line:#23233a;
     --txt:#e9e9f5; --dim:#8a8aa5; --accent:#b14bff; --accent2:#ff2e88;
-    --on:#ff2e88; --on2:#b14bff; --beat:#2a2a42;
-    --kick:#ff5a3c; --e808:#ff2e88; --snare:#ffcf3c; --clap:#ffa23c;
-    --hat:#3cf0ff; --ohat:#3c9bff; --lead:#b14bff; --perc:#5cff9e;
   }
-  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;-webkit-user-select:none;user-select:none;}
-  html,body{margin:0;height:100%;background:var(--bg);color:var(--txt);
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;min-height:100%;background:var(--bg);color:var(--txt);
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif;
-    overscroll-behavior:none;touch-action:manipulation;}
-  body{display:flex;flex-direction:column;padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);}
+    overscroll-behavior-y:none;}
+  body{display:flex;flex-direction:column;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);}
+  input,textarea,button,select{font-family:inherit;}
+  ::selection{background:var(--accent);color:#fff;}
 
-  header{padding:10px 14px 8px;display:flex;align-items:center;gap:10px;
-    border-bottom:1px solid var(--line);background:linear-gradient(180deg,#12121c,#0b0b12);position:sticky;top:0;z-index:20;}
-  .logo{font-weight:800;letter-spacing:2px;font-size:18px;
+  header{padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,#12121c,#0b0b12);position:sticky;top:0;z-index:20;}
+  .logo{font-weight:800;letter-spacing:2px;font-size:19px;
     background:linear-gradient(90deg,var(--accent2),var(--accent));-webkit-background-clip:text;background-clip:text;color:transparent;}
   .logo small{display:block;font-size:9px;letter-spacing:3px;color:var(--dim);font-weight:600;-webkit-text-fill-color:var(--dim);}
   header .spacer{flex:1;}
-  .install-hint{font-size:10px;color:var(--dim);max-width:130px;line-height:1.2;text-align:right;}
+  .gear{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:9px 12px;font-size:16px;color:var(--txt);}
 
-  .transport{display:flex;gap:8px;align-items:center;padding:10px 12px;flex-wrap:wrap;
-    border-bottom:1px solid var(--line);background:var(--panel);position:sticky;top:49px;z-index:19;}
-  button{font-family:inherit;color:var(--txt);background:var(--panel2);border:1px solid var(--line);
-    border-radius:12px;padding:11px 14px;font-size:14px;font-weight:600;cursor:pointer;transition:.08s;}
-  button:active{transform:scale(.95);}
-  .play{background:linear-gradient(135deg,var(--accent2),var(--accent));border:none;min-width:64px;color:#fff;font-size:16px;}
-  .play.playing{background:linear-gradient(135deg,#2a2a42,#1c1c2c);color:var(--accent2);border:1px solid var(--accent2);}
-  .gen{background:linear-gradient(135deg,#241033,#3a1550);border:1px solid var(--accent);color:#e9c7ff;}
-  .icon-btn{padding:11px 12px;}
+  main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px 40px;max-width:640px;width:100%;margin:0 auto;}
 
-  .knob-group{display:flex;align-items:center;gap:6px;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:6px 10px;}
-  .knob-group label{font-size:9px;color:var(--dim);letter-spacing:1px;}
-  .knob-group .val{font-size:14px;font-weight:700;min-width:42px;text-align:center;}
-  .step-btn{background:var(--panel);border:1px solid var(--line);width:30px;height:30px;padding:0;border-radius:8px;font-size:16px;line-height:1;}
+  .banner{background:linear-gradient(135deg,#2a0f14,#1c1020);border:1px solid var(--accent2);border-radius:14px;
+    padding:12px 14px;font-size:12.5px;line-height:1.5;color:#ffd9e7;margin-bottom:16px;}
+  .banner b{color:#fff;}
+  .banner.hide{display:none;}
 
-  main{flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding:8px 6px 90px;}
+  label.fld{display:block;font-size:11px;letter-spacing:1px;color:var(--dim);font-weight:700;margin:16px 2px 7px;text-transform:uppercase;}
 
-  .track{display:flex;align-items:center;margin:4px 2px;gap:6px;}
-  .track-head{width:74px;flex:0 0 74px;display:flex;flex-direction:column;gap:3px;}
-  .track-name{font-size:11px;font-weight:800;letter-spacing:.5px;display:flex;align-items:center;gap:4px;white-space:nowrap;}
-  .dot{width:8px;height:8px;border-radius:50%;flex:0 0 8px;}
-  .track-ctrls{display:flex;gap:3px;}
-  .mini{font-size:8px;padding:3px 5px;border-radius:6px;background:var(--panel);border:1px solid var(--line);color:var(--dim);font-weight:700;letter-spacing:.5px;}
-  .mini.active{background:var(--accent);color:#fff;border-color:var(--accent);}
-  .mini.mute.active{background:#ff3b3b;border-color:#ff3b3b;}
+  .presets{display:flex;gap:8px;flex-wrap:wrap;}
+  .chip{background:var(--panel2);border:1px solid var(--line);color:var(--txt);border-radius:20px;
+    padding:9px 14px;font-size:13px;font-weight:600;cursor:pointer;transition:.1s;}
+  .chip:active{transform:scale(.95);}
+  .chip.sel{background:linear-gradient(135deg,var(--accent2),var(--accent));border:none;color:#fff;}
 
-  .steps{display:grid;grid-template-columns:repeat(16,1fr);gap:3px;flex:1;min-width:0;}
-  .cell{position:relative;height:34px;border-radius:6px;background:var(--panel2);border:1px solid var(--line);
-    display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:700;color:var(--dim);overflow:hidden;}
-  .cell.beat{background:var(--beat);}
-  .cell.on{border-color:transparent;color:#0a0a0f;box-shadow:0 0 10px -2px currentColor;}
-  .cell.playhead{outline:2px solid #fff;outline-offset:-2px;z-index:2;}
-  .cell .note{font-size:8px;line-height:1;pointer-events:none;font-weight:800;}
-  .cell .vel{position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(255,255,255,.5);}
+  textarea{width:100%;min-height:96px;background:var(--panel2);border:1px solid var(--line);border-radius:14px;
+    color:var(--txt);font-size:15px;padding:14px;line-height:1.5;resize:vertical;}
+  textarea:focus{outline:none;border-color:var(--accent);}
 
-  .section-title{font-size:10px;letter-spacing:2px;color:var(--dim);font-weight:700;margin:14px 4px 4px;text-transform:uppercase;}
-
-  .fx-wrap{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px;padding:4px;}
-  .fx{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:10px 12px;}
-  .fx h4{margin:0 0 8px;font-size:11px;letter-spacing:1px;color:var(--txt);display:flex;justify-content:space-between;}
-  .fx h4 span{color:var(--accent);font-weight:700;}
-  input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:26px;background:transparent;margin:0;}
+  .rowline{display:flex;gap:12px;align-items:center;margin-top:14px;}
+  .lenbox{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:14px;padding:12px 14px;}
+  .lenbox .top{display:flex;justify-content:space-between;font-size:11px;color:var(--dim);font-weight:700;letter-spacing:1px;}
+  .lenbox .top b{color:var(--txt);font-size:14px;}
+  input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:26px;background:transparent;margin:6px 0 0;}
   input[type=range]::-webkit-slider-runnable-track{height:6px;border-radius:3px;background:linear-gradient(90deg,var(--accent),var(--accent2));}
-  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:#fff;margin-top:-8px;box-shadow:0 1px 4px rgba(0,0,0,.6);}
-  .row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
-  .row label{font-size:10px;color:var(--dim);width:52px;flex:0 0 52px;}
-  .row .rv{font-size:10px;color:var(--txt);width:36px;text-align:right;flex:0 0 36px;}
+  input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:24px;height:24px;border-radius:50%;background:#fff;margin-top:-9px;box-shadow:0 1px 5px rgba(0,0,0,.6);}
 
-  select{font-family:inherit;background:var(--panel2);color:var(--txt);border:1px solid var(--line);border-radius:10px;padding:9px;font-size:13px;font-weight:600;}
+  .genbtn{width:100%;margin-top:20px;padding:18px;border:none;border-radius:16px;font-size:18px;font-weight:800;letter-spacing:.5px;
+    background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;cursor:pointer;box-shadow:0 8px 24px -8px var(--accent);}
+  .genbtn:active{transform:scale(.98);}
+  .genbtn:disabled{opacity:.55;box-shadow:none;}
 
-  .pattern-bar{display:flex;gap:6px;align-items:center;padding:8px 12px;border-top:1px solid var(--line);
-    background:var(--panel);overflow-x:auto;position:sticky;bottom:0;z-index:15;}
-  .pat{flex:0 0 auto;width:34px;height:34px;border-radius:9px;background:var(--panel2);border:1px solid var(--line);
-    font-size:13px;font-weight:800;color:var(--dim);padding:0;}
-  .pat.active{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;border:none;}
-  .pat.hasdata{color:var(--txt);border-color:var(--accent);}
+  .status{margin-top:16px;font-size:13px;color:var(--dim);text-align:center;min-height:20px;line-height:1.5;}
+  .status .err{color:#ff6b6b;}
+  .status .ok{color:#5cff9e;}
+  .spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--line);border-top-color:var(--accent2);
+    border-radius:50%;animation:spin .8s linear infinite;vertical-align:-3px;margin-right:6px;}
+  @keyframes spin{to{transform:rotate(360deg)}}
 
-  .hint{font-size:10px;color:var(--dim);padding:10px 14px;line-height:1.5;}
-  .toast{position:fixed;left:50%;bottom:96px;transform:translateX(-50%);background:#000d;border:1px solid var(--accent);
-    color:#fff;padding:9px 16px;border-radius:20px;font-size:12px;font-weight:600;opacity:0;pointer-events:none;transition:.25s;z-index:50;}
-  .toast.show{opacity:1;}
-  .kbd{background:#000;border:1px solid var(--line);border-radius:4px;padding:1px 5px;font-size:10px;color:var(--accent);}
+  .results{margin-top:24px;}
+  .track{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:14px;margin-bottom:12px;}
+  .track h3{margin:0 0 4px;font-size:14px;font-weight:700;}
+  .track .meta{font-size:11px;color:var(--dim);margin-bottom:10px;word-break:break-word;line-height:1.4;}
+  .track audio{width:100%;height:40px;}
+  .track .acts{display:flex;gap:8px;margin-top:10px;}
+  .track .acts a,.track .acts button{flex:1;text-align:center;background:var(--panel2);border:1px solid var(--line);
+    color:var(--txt);border-radius:10px;padding:10px;font-size:13px;font-weight:600;text-decoration:none;cursor:pointer;}
+  .track .acts a.dl{background:linear-gradient(135deg,var(--accent),var(--accent2));border:none;color:#fff;}
+
+  .foot{margin-top:28px;padding-top:16px;border-top:1px solid var(--line);font-size:12px;color:var(--dim);line-height:1.6;text-align:center;}
+  .foot a{color:var(--accent);text-decoration:none;}
+
+  /* settings modal */
+  .modal{position:fixed;inset:0;background:#000c;backdrop-filter:blur(4px);z-index:50;display:none;align-items:flex-end;justify-content:center;}
+  .modal.open{display:flex;}
+  .sheet{background:var(--panel);border:1px solid var(--line);border-radius:20px 20px 0 0;width:100%;max-width:640px;
+    padding:18px 16px calc(24px + env(safe-area-inset-bottom));max-height:92vh;overflow-y:auto;}
+  .sheet h2{margin:0 0 4px;font-size:17px;}
+  .sheet p.sub{margin:0 0 14px;font-size:12px;color:var(--dim);line-height:1.5;}
+  .seg{display:flex;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:14px;}
+  .seg button{flex:1;background:transparent;border:none;color:var(--dim);padding:10px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;}
+  .seg button.on{background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;}
+  .sheet label{display:block;font-size:11px;letter-spacing:1px;color:var(--dim);font-weight:700;margin:12px 2px 6px;text-transform:uppercase;}
+  .sheet input[type=text],.sheet input[type=password]{width:100%;background:var(--panel2);border:1px solid var(--line);
+    border-radius:12px;color:var(--txt);font-size:14px;padding:13px;}
+  .sheet input:focus{outline:none;border-color:var(--accent);}
+  .sheet .help{font-size:11px;color:var(--dim);line-height:1.5;margin-top:6px;}
+  .sheet .help a{color:var(--accent);}
+  .sheet .save{width:100%;margin-top:18px;padding:15px;border:none;border-radius:14px;font-size:15px;font-weight:800;
+    background:linear-gradient(135deg,var(--accent2),var(--accent));color:#fff;cursor:pointer;}
+  .sheet .close{width:100%;margin-top:8px;padding:13px;border:1px solid var(--line);border-radius:14px;font-size:14px;
+    background:transparent;color:var(--dim);cursor:pointer;}
+  .mode-panel{display:none;}
+  .mode-panel.show{display:block;}
+  code{background:#000;border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-size:11px;color:var(--accent2);}
 </style>
 </head>
 <body>
 
 <header>
-  <div class="logo">RAGE<small>BEAT MAKER</small></div>
+  <div class="logo">RAGE AI<small>BEAT GENERATOR</small></div>
   <div class="spacer"></div>
-  <div class="install-hint">Tap <b>Share → Add to Home Screen</b> to install</div>
+  <button class="gear" id="gearBtn">⚙︎</button>
 </header>
 
-<div class="transport">
-  <button id="play" class="play">▶</button>
-  <button id="gen" class="gen">✨ Generate</button>
-
-  <div class="knob-group">
-    <button class="step-btn" data-bpm="-5">–</button>
-    <div><label>BPM</label><div class="val" id="bpmVal">146</div></div>
-    <button class="step-btn" data-bpm="5">+</button>
-  </div>
-
-  <div class="knob-group">
-    <label>KEY</label>
-    <select id="key">
-      <option>C</option><option>C#</option><option>D</option><option>D#</option>
-      <option selected>E</option><option>F</option><option>F#</option><option>G</option>
-      <option>G#</option><option>A</option><option>A#</option><option>B</option>
-    </select>
-    <select id="scale">
-      <option value="minor" selected>Minor</option>
-      <option value="phrygian">Phrygian (darkest)</option>
-      <option value="harmonic">Harmonic Minor</option>
-      <option value="minorPent">Minor Pentatonic</option>
-    </select>
-  </div>
-
-  <div class="knob-group">
-    <button class="step-btn" data-swing="-4">–</button>
-    <div><label>SWING</label><div class="val" id="swingVal">0%</div></div>
-    <button class="step-btn" data-swing="4">+</button>
-  </div>
-
-  <button id="tap" class="icon-btn">TAP</button>
-  <button id="clear" class="icon-btn">Clear</button>
-  <button id="master" class="icon-btn">🔊</button>
-</div>
-
 <main>
-  <div class="section-title">Sequencer — tap to toggle · drag ↑↓ on 808/Lead to change note</div>
-  <div id="grid"></div>
+  <div class="banner" id="setupBanner">
+    <b>One-time setup needed.</b> This generates real beats with the ElevenLabs Music AI, so it needs your
+    API key. Tap <b>⚙︎</b> (top right) to connect. It costs credits per beat.
+    <br><br>No key yet? Also try the free offline <a href="studio.html" style="color:#fff;text-decoration:underline;">Studio synth</a>.
+  </div>
 
-  <div class="section-title">Sound & FX</div>
-  <div class="fx-wrap" id="fxwrap"></div>
+  <label class="fld">Pick a vibe</label>
+  <div class="presets" id="presets"></div>
 
-  <div class="hint">
-    <b>Quick start:</b> hit <span class="kbd">✨ Generate</span> a few times until you catch a vibe, tweak the
-    <b>808 Distortion</b> and <b>Reverb</b>, then <span class="kbd">▶</span> play. Use the pattern slots below (A–H) to
-    build sections and chain them. Everything runs offline once installed. Best in headphones. 🔥
+  <label class="fld">Or describe your beat</label>
+  <textarea id="prompt" placeholder="e.g. dark underground rage beat, distorted booming 808s, fast trap hi-hats, eerie detuned synth lead, Ken Carson / Opium style, minor key, 150 BPM, instrumental, no vocals"></textarea>
+
+  <div class="rowline">
+    <div class="lenbox">
+      <div class="top"><span>LENGTH</span><b id="lenVal">40s</b></div>
+      <input type="range" id="len" min="10" max="120" step="5" value="40" />
+    </div>
+  </div>
+
+  <button class="genbtn" id="genBtn">✨ Generate Beat</button>
+  <div class="status" id="status"></div>
+
+  <div class="results" id="results"></div>
+
+  <div class="foot">
+    Powered by ElevenLabs Music. Beats are generated on their servers.<br>
+    Free offline synth: <a href="studio.html">open Studio →</a>
   </div>
 </main>
 
-<div class="pattern-bar" id="patternBar"></div>
-<div class="toast" id="toast"></div>
+<!-- SETTINGS -->
+<div class="modal" id="modal">
+  <div class="sheet">
+    <h2>Connect your beat AI</h2>
+    <p class="sub">Choose how the app reaches ElevenLabs Music. Your key is stored only on this device.</p>
+
+    <div class="seg" id="seg">
+      <button data-mode="proxy" class="on">Proxy (safer)</button>
+      <button data-mode="direct">Direct key</button>
+    </div>
+
+    <!-- PROXY MODE -->
+    <div class="mode-panel show" id="panel-proxy">
+      <label>Worker / Proxy URL</label>
+      <input type="text" id="proxyUrl" placeholder="https://your-worker.workers.dev" autocapitalize="off" autocorrect="off" spellcheck="false" />
+      <div class="help">
+        Recommended. Your API key lives on a tiny free Cloudflare Worker, never in this app.
+        Setup steps are in the repo's <code>PROXY_SETUP.md</code>. Paste the Worker URL it gives you above.
+      </div>
+    </div>
+
+    <!-- DIRECT MODE -->
+    <div class="mode-panel" id="panel-direct">
+      <label>ElevenLabs API key</label>
+      <input type="password" id="apiKey" placeholder="sk_..." autocapitalize="off" autocorrect="off" spellcheck="false" />
+      <div class="help">
+        Get a key at <a href="https://elevenlabs.io/app/settings/api-keys" target="_blank" rel="noopener">elevenlabs.io → API Keys</a>.
+        Stored only on your phone. Note: may be blocked by the browser (CORS) — if it fails, use Proxy mode.
+      </div>
+      <label style="margin-top:14px;">Model</label>
+      <input type="text" id="modelId" placeholder="music_v1" autocapitalize="off" autocorrect="off" spellcheck="false" />
+      <div class="help">Leave as <code>music_v1</code> unless you know otherwise.</div>
+    </div>
+
+    <button class="save" id="saveBtn">Save</button>
+    <button class="close" id="closeBtn">Close</button>
+  </div>
+</div>
 
 <script>
 "use strict";
-/* ============================================================================
-   RAGE — Underground Rap / Rage Beat Maker
-   Pure Web Audio API. No samples, fully offline. Mobile-first.
+/* ==========================================================================
+   RAGE AI — Beat Generator (ElevenLabs Music)
    ========================================================================== */
 
-const AC = window.AudioContext || window.webkitAudioContext;
-let ctx = null;
-
-/* ---------- Global music state ---------- */
-const SCALES = {
-  minor:      [0,2,3,5,7,8,10],
-  phrygian:   [0,1,3,5,7,8,10],
-  harmonic:   [0,2,3,5,7,8,11],
-  minorPent:  [0,3,5,7,10],
-};
-const NOTE_NAMES = ["C","C#","D","D#","E","F","F#","G","G#","A","A#","B"];
-const KEYS = {C:0,"C#":1,D:2,"D#":3,E:4,F:5,"F#":6,G:7,"G#":8,A:9,"A#":10,B:11};
-
-const state = {
-  bpm: 146,
-  swing: 0,
-  key: "E",
-  scale: "minor",
-  playing: false,
-  master: 0.9,
-  curStep: 0,
-  curPattern: 0,
+const LS = {
+  get:(k,d)=>{ try{const v=localStorage.getItem("rageai_"+k);return v===null?d:JSON.parse(v);}catch(e){return d;} },
+  set:(k,v)=>{ try{localStorage.setItem("rageai_"+k,JSON.stringify(v));}catch(e){} },
 };
 
-/* ---------- Track definitions ----------
-   pitched tracks store a scale-degree index per step (0 = root of low octave). */
-const TRACKS = [
-  {id:"kick",  name:"KICK",   color:"var(--kick)",  pitched:false, vol:1.0},
-  {id:"e808",  name:"808",    color:"var(--e808)",  pitched:true,  vol:1.0, baseOct:1},
-  {id:"snare", name:"SNARE",  color:"var(--snare)", pitched:false, vol:0.9},
-  {id:"clap",  name:"CLAP",   color:"var(--clap)",  pitched:false, vol:0.8},
-  {id:"hat",   name:"HAT",    color:"var(--hat)",   pitched:false, vol:0.6},
-  {id:"ohat",  name:"OPEN",   color:"var(--ohat)",  pitched:false, vol:0.55},
-  {id:"lead",  name:"LEAD",   color:"var(--lead)",  pitched:true,  vol:0.7, baseOct:3},
-  {id:"perc",  name:"PERC",   color:"var(--perc)",  pitched:false, vol:0.6},
+const cfg = {
+  mode:   LS.get("mode","proxy"),
+  proxyUrl: LS.get("proxyUrl",""),
+  apiKey: LS.get("apiKey",""),
+  modelId: LS.get("modelId","music_v1"),
+};
+
+/* ---- Genre presets: each fills a rich, genre-accurate prompt ---- */
+const PRESETS = [
+  {name:"Ken Carson Rage", p:"Dark aggressive underground rage rap instrumental in the style of Ken Carson and Opium, heavy distorted booming 808 bass with slides, hard punchy kick, fast trap hi-hats with rolls and triplets, eerie detuned supersaw synth lead, reverb-drenched, minor key, around 150 BPM, energetic and menacing, instrumental beat, no vocals"},
+  {name:"Vax Opium", p:"Melodic dark opium-style underground rap beat like Vax, atmospheric detuned synth melody, distorted 808 bass, spacey reverb, fast rolling hi-hats, moody minor key, hypnotic and hazy, around 145 BPM, instrumental, no vocals"},
+  {name:"Carti Dark", p:"Playboi Carti dark vamp-style trap instrumental, deep distorted 808s, aggressive punchy drums, eerie bell and synth stabs, lots of reverb and space, minor key, 148 BPM, sinister and hard, instrumental, no vocals"},
+  {name:"Destroy Lonely", p:"Destroy Lonely style underground trap beat, smooth detuned synth lead, rolling 808 bassline, crisp fast hi-hats, dreamy reverb, laid back but hard, minor key, 140 BPM, instrumental, no vocals"},
+  {name:"Hard Trap 808", p:"Hard modern trap instrumental, booming distorted 808 bass, knocking kick, sharp snappy claps, fast hi-hat rolls, dark minor synth melody, aggressive, 150 BPM, instrumental, no vocals"},
+  {name:"Ambient Rage Intro", p:"Slow eerie ambient intro building into a dark rage beat, distant detuned synth pads, deep sub 808, sparse hard drums entering, heavy reverb, ominous minor key, cinematic, instrumental, no vocals"},
 ];
-const STEPS = 16;
-const NUM_PATTERNS = 8;
 
-function blankPattern(){
-  const p = {};
-  TRACKS.forEach(t=>{
-    p[t.id] = {
-      on:  new Array(STEPS).fill(false),
-      note:new Array(STEPS).fill(0),   // scale-degree index for pitched
-      mute:false, solo:false,
-    };
-  });
-  return p;
-}
-let patterns = Array.from({length:NUM_PATTERNS}, blankPattern);
-function pat(){ return patterns[state.curPattern]; }
+/* ---- DOM ---- */
+const $ = s=>document.querySelector(s);
+const presetsEl=$("#presets"), promptEl=$("#prompt"), statusEl=$("#status"), resultsEl=$("#results");
+const genBtn=$("#genBtn"), lenEl=$("#len"), lenVal=$("#lenVal");
 
-/* ---------- FX / sound parameters ---------- */
-const fx = {
-  drive: 0.55,      // 808 distortion amount
-  glide: 0.45,      // 808 glide/slide amount
-  sub: 0.5,         // 808 sub weight
-  reverb: 0.45,     // send to reverb
-  space: 0.35,      // lead delay/echo
-  filter: 0.85,     // master lowpass (0..1 -> freq)
-  leadDetune: 0.4,  // lead supersaw spread
-  punch: 0.6,       // kick punch
-};
-
-/* ============================================================================
-   AUDIO GRAPH
-   ========================================================================== */
-let master, comp, masterFilter, revBus, revConv, revReturn, delayBus, delayNode, delayFb, delayReturn;
-
-function makeImpulse(seconds, decay){
-  const rate = ctx.sampleRate, len = rate*seconds;
-  const buf = ctx.createBuffer(2, len, rate);
-  for(let c=0;c<2;c++){
-    const d = buf.getChannelData(c);
-    for(let i=0;i<len;i++){
-      d[i] = (Math.random()*2-1) * Math.pow(1 - i/len, decay);
-    }
-  }
-  return buf;
-}
-function makeCurve(amount){
-  const n=1024, curve=new Float32Array(n), k=amount*100;
-  for(let i=0;i<n;i++){ const x=i*2/n-1; curve[i]=(1+k)*x/(1+k*Math.abs(x)); }
-  return curve;
-}
-
-function buildGraph(){
-  master = ctx.createGain(); master.gain.value = state.master;
-  comp = ctx.createDynamicsCompressor();
-  comp.threshold.value=-8; comp.knee.value=6; comp.ratio.value=4; comp.attack.value=0.003; comp.release.value=0.25;
-
-  masterFilter = ctx.createBiquadFilter();
-  masterFilter.type="lowpass"; masterFilter.frequency.value=18000; masterFilter.Q.value=0.6;
-
-  master.connect(masterFilter); masterFilter.connect(comp); comp.connect(ctx.destination);
-
-  // Reverb bus
-  revBus = ctx.createGain();
-  revConv = ctx.createConvolver(); revConv.buffer = makeImpulse(2.6, 3.2);
-  revReturn = ctx.createGain(); revReturn.gain.value=0.9;
-  revBus.connect(revConv); revConv.connect(revReturn); revReturn.connect(master);
-
-  // Delay bus (space/echo for lead)
-  delayBus = ctx.createGain();
-  delayNode = ctx.createDelay(1.0);
-  delayFb = ctx.createGain(); delayFb.gain.value=0.35;
-  delayReturn = ctx.createGain(); delayReturn.gain.value=0.9;
-  delayBus.connect(delayNode); delayNode.connect(delayFb); delayFb.connect(delayNode);
-  delayNode.connect(delayReturn); delayReturn.connect(master);
-  applyFilter();
-}
-function applyFilter(){
-  if(!masterFilter) return;
-  const f = 200 * Math.pow(90, fx.filter); // 200 .. 18000
-  masterFilter.frequency.setTargetAtTime(f, ctx.currentTime, 0.02);
-}
-function setDelayTime(){
-  if(!delayNode) return;
-  const beat = 60/state.bpm;
-  delayNode.delayTime.setTargetAtTime(beat*0.75, ctx.currentTime, 0.05); // dotted-8th-ish
-}
-
-/* ---------- Note helpers ---------- */
-function degreeToFreq(track, degIndex){
-  const scale = SCALES[state.scale];
-  const root = KEYS[state.key];
-  const octaveBase = (track.baseOct||2);
-  const oct = Math.floor(degIndex/scale.length);
-  const deg = ((degIndex%scale.length)+scale.length)%scale.length;
-  const semis = scale[deg] + 12*(octaveBase+oct) + root;
-  return 27.5 * Math.pow(2, (semis+9)/12); // MIDI-ish; A0=27.5 baseline
-}
-
-/* ============================================================================
-   INSTRUMENT VOICES (synthesized)
-   ========================================================================== */
-function trackGain(track){
-  const p = pat()[track.id];
-  const solos = TRACKS.some(t=>pat()[t.id].solo);
-  if(p.mute) return 0;
-  if(solos && !p.solo) return 0;
-  return track.vol;
-}
-
-function voiceKick(t, vel){
-  const g = ctx.createGain();
-  const o = ctx.createOscillator(); o.type="sine";
-  const punch = 40 + fx.punch*140;
-  o.frequency.setValueAtTime(150+punch, t);
-  o.frequency.exponentialRampToValueAtTime(46, t+0.09);
-  g.gain.setValueAtTime(0.0001,t);
-  g.gain.exponentialRampToValueAtTime(vel,t+0.004);
-  g.gain.exponentialRampToValueAtTime(0.0001,t+0.42);
-  // click
-  const cg=ctx.createGain(); const cn=noiseBuf(0.02); cn.playbackRate.value=1;
-  const cf=ctx.createBiquadFilter(); cf.type="highpass"; cf.frequency.value=2000;
-  cg.gain.setValueAtTime(vel*0.5,t); cg.gain.exponentialRampToValueAtTime(0.0001,t+0.03);
-  cn.connect(cf); cf.connect(cg); cg.connect(master);
-  o.connect(g); g.connect(master);
-  o.start(t); o.stop(t+0.45); cn.start(t); cn.stop(t+0.03);
-}
-
-let lastE808Freq = null;
-function voice808(t, vel, freq, len){
-  const g = ctx.createGain();
-  const o = ctx.createOscillator(); o.type="sine";
-  const sub = ctx.createOscillator(); sub.type="sine"; sub.frequency.value=freq/2;
-  const subG = ctx.createGain(); subG.gain.value = fx.sub*0.6;
-
-  const shaper = ctx.createWaveShaper(); shaper.curve = makeCurve(fx.drive); shaper.oversample="4x";
-  const drySplit = ctx.createGain(); const wetSplit = ctx.createGain();
-  drySplit.gain.value = 1 - fx.drive*0.55; wetSplit.gain.value = fx.drive*0.9;
-
-  // glide from previous note
-  const gl = fx.glide*0.12;
-  if(lastE808Freq && gl>0.001){
-    o.frequency.setValueAtTime(lastE808Freq, t);
-    o.frequency.exponentialRampToValueAtTime(freq, t+gl);
-  } else {
-    o.frequency.setValueAtTime(freq*1.5, t);
-    o.frequency.exponentialRampToValueAtTime(freq, t+0.05);
-  }
-  lastE808Freq = freq;
-
-  const dur = Math.max(0.25, len);
-  g.gain.setValueAtTime(0.0001,t);
-  g.gain.exponentialRampToValueAtTime(vel,t+0.006);
-  g.gain.setValueAtTime(vel,t+dur*0.6);
-  g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
-
-  o.connect(g); sub.connect(subG); subG.connect(g);
-  g.connect(drySplit); g.connect(shaper); shaper.connect(wetSplit);
-  const out = ctx.createGain();
-  drySplit.connect(out); wetSplit.connect(out);
-  out.connect(master);
-  const rs=ctx.createGain(); rs.gain.value=fx.reverb*0.25; out.connect(rs); rs.connect(revBus);
-
-  o.start(t); sub.start(t); o.stop(t+dur+0.05); sub.stop(t+dur+0.05);
-}
-
-function noiseBuf(dur){
-  const len = Math.max(1, Math.floor(ctx.sampleRate*dur));
-  const b = ctx.createBuffer(1,len,ctx.sampleRate);
-  const d=b.getChannelData(0);
-  for(let i=0;i<len;i++) d[i]=Math.random()*2-1;
-  const src=ctx.createBufferSource(); src.buffer=b; return src;
-}
-
-function voiceSnare(t, vel){
-  const n=noiseBuf(0.25);
-  const f=ctx.createBiquadFilter(); f.type="highpass"; f.frequency.value=1400;
-  const g=ctx.createGain();
-  g.gain.setValueAtTime(vel,t); g.gain.exponentialRampToValueAtTime(0.0001,t+0.18);
-  // body tone
-  const o=ctx.createOscillator(); o.type="triangle"; o.frequency.setValueAtTime(220,t);
-  o.frequency.exponentialRampToValueAtTime(140,t+0.1);
-  const og=ctx.createGain(); og.gain.setValueAtTime(vel*0.5,t); og.gain.exponentialRampToValueAtTime(0.0001,t+0.12);
-  n.connect(f); f.connect(g); g.connect(master); o.connect(og); og.connect(master);
-  const rs=ctx.createGain(); rs.gain.value=fx.reverb*0.35; g.connect(rs); rs.connect(revBus);
-  n.start(t); n.stop(t+0.25); o.start(t); o.stop(t+0.13);
-}
-
-function voiceClap(t, vel){
-  // 3 quick noise bursts
-  for(let i=0;i<3;i++){
-    const tt=t+i*0.012;
-    const n=noiseBuf(0.08);
-    const f=ctx.createBiquadFilter(); f.type="bandpass"; f.frequency.value=1600; f.Q.value=0.8;
-    const g=ctx.createGain();
-    g.gain.setValueAtTime(vel*(i===2?1:0.6),tt); g.gain.exponentialRampToValueAtTime(0.0001,tt+0.08);
-    n.connect(f); f.connect(g); g.connect(master);
-    const rs=ctx.createGain(); rs.gain.value=fx.reverb*0.4; g.connect(rs); rs.connect(revBus);
-    n.start(tt); n.stop(tt+0.08);
-  }
-}
-
-function voiceHat(t, vel, open){
-  const dur = open ? 0.28 : 0.045;
-  const n=noiseBuf(dur+0.02);
-  const f=ctx.createBiquadFilter(); f.type="highpass"; f.frequency.value=7000; f.Q.value=0.7;
-  const f2=ctx.createBiquadFilter(); f2.type="bandpass"; f2.frequency.value=9000; f2.Q.value=1.2;
-  const g=ctx.createGain();
-  g.gain.setValueAtTime(vel,t); g.gain.exponentialRampToValueAtTime(0.0001,t+dur);
-  n.connect(f); f.connect(f2); f2.connect(g); g.connect(master);
-  n.start(t); n.stop(t+dur+0.02);
-}
-
-function voicePerc(t, vel, freq){
-  // metallic pluck / rim
-  const o=ctx.createOscillator(); o.type="square"; o.frequency.value=(freq||440)*2;
-  const f=ctx.createBiquadFilter(); f.type="bandpass"; f.frequency.value=(freq||440)*3; f.Q.value=6;
-  const g=ctx.createGain();
-  g.gain.setValueAtTime(vel*0.6,t); g.gain.exponentialRampToValueAtTime(0.0001,t+0.13);
-  o.connect(f); f.connect(g); g.connect(master);
-  const rs=ctx.createGain(); rs.gain.value=fx.reverb*0.5; g.connect(rs); rs.connect(revBus);
-  o.start(t); o.stop(t+0.14);
-}
-
-function voiceLead(t, vel, freq, len){
-  // detuned supersaw pluck with reverb + delay
-  const voices=3, out=ctx.createGain();
-  const spread = 4 + fx.leadDetune*18;
-  for(let i=0;i<voices;i++){
-    const o=ctx.createOscillator(); o.type="sawtooth";
-    o.frequency.value=freq; o.detune.value=(i-1)*spread;
-    o.connect(out); o.start(t); o.stop(t+len+0.1);
-  }
-  const f=ctx.createBiquadFilter(); f.type="lowpass";
-  f.frequency.setValueAtTime(freq*8,t); f.frequency.exponentialRampToValueAtTime(freq*2.2,t+len);
-  f.Q.value=6;
-  const g=ctx.createGain();
-  g.gain.setValueAtTime(0.0001,t); g.gain.exponentialRampToValueAtTime(vel*0.5,t+0.01);
-  g.gain.exponentialRampToValueAtTime(0.0001,t+len);
-  out.connect(f); f.connect(g); g.connect(master);
-  const rs=ctx.createGain(); rs.gain.value=fx.reverb*0.6; g.connect(rs); rs.connect(revBus);
-  const ds=ctx.createGain(); ds.gain.value=fx.space*0.7; g.connect(ds); ds.connect(delayBus);
-}
-
-/* ---------- Trigger dispatcher ---------- */
-function trigger(track, t, vel, step){
-  const p = pat()[track.id];
-  const g = trackGain(track);
-  if(g<=0) return;
-  vel *= g;
-  switch(track.id){
-    case "kick":  voiceKick(t,vel); break;
-    case "808":
-    case "e808":  {
-      const freq=degreeToFreq(track, p.note[step]);
-      const beat=60/state.bpm; let len=beat*0.9;
-      // extend if next steps are empty (long slides)
-      let k=step+1; while(k<STEPS && !p.on[k] && k<step+4){len+=beat*0.5;k++;}
-      voice808(t,vel,freq,len); break;
-    }
-    case "snare": voiceSnare(t,vel); break;
-    case "clap":  voiceClap(t,vel); break;
-    case "hat":   voiceHat(t,vel,false); break;
-    case "ohat":  voiceHat(t,vel,true); break;
-    case "perc":  voicePerc(t,vel, degreeToFreq({baseOct:3},2)); break;
-    case "lead":  {
-      const freq=degreeToFreq(track,p.note[step]);
-      const beat=60/state.bpm; voiceLead(t,vel,freq,beat*0.9); break;
-    }
-  }
-}
-
-/* ============================================================================
-   SCHEDULER (lookahead)
-   ========================================================================== */
-let nextStepTime=0, schedStep=0, timerId=null;
-const LOOKAHEAD=0.1, INTERVAL=25;
-
-function stepDur(){ return (60/state.bpm)/4; } // 16th
-function scheduleStep(step, time){
-  TRACKS.forEach(track=>{
-    const p=pat()[track.id];
-    if(p.on[step]){
-      // subtle humanized velocity, accent on downbeats
-      let vel=0.85; if(step%4===0) vel=1.0; if(track.id==="hat") vel*=(0.6+Math.random()*0.5);
-      trigger(track, time, vel, step);
-    }
-  });
-  // visual
-  const drawStep=step, drawTime=time;
-  drawQueue.push({step:drawStep, time:drawTime});
-}
-function scheduler(){
-  while(nextStepTime < ctx.currentTime + LOOKAHEAD){
-    // swing: delay odd 16ths
-    let t=nextStepTime;
-    if(schedStep%2===1) t += (state.swing/100)*stepDur()*0.9;
-    scheduleStep(schedStep, t);
-    nextStepTime += stepDur();
-    schedStep=(schedStep+1)%STEPS;
-    if(schedStep===0) lastE808Freq=null;
-  }
-  timerId=setTimeout(scheduler, INTERVAL);
-}
-
-let drawQueue=[];
-function drawLoop(){
-  const now=ctx?ctx.currentTime:0;
-  while(drawQueue.length && drawQueue[0].time<=now){
-    const d=drawQueue.shift(); paintPlayhead(d.step);
-  }
-  requestAnimationFrame(drawLoop);
-}
-
-/* ============================================================================
-   TRANSPORT
-   ========================================================================== */
-async function ensureCtx(){
-  if(!ctx){ ctx=new AC(); buildGraph(); }
-  if(ctx.state==="suspended") await ctx.resume();
-}
-async function play(){
-  await ensureCtx();
-  state.playing=true; schedStep=0; nextStepTime=ctx.currentTime+0.05; lastE808Freq=null;
-  setDelayTime();
-  scheduler();
-  document.getElementById("play").classList.add("playing");
-  document.getElementById("play").textContent="■";
-}
-function stop(){
-  state.playing=false; clearTimeout(timerId); drawQueue=[];
-  document.getElementById("play").classList.remove("playing");
-  document.getElementById("play").textContent="▶";
-  document.querySelectorAll(".cell.playhead").forEach(c=>c.classList.remove("playhead"));
-}
-function togglePlay(){ state.playing?stop():play(); }
-
-/* ============================================================================
-   UI BUILD
-   ========================================================================== */
-const grid=document.getElementById("grid");
-const cellEls={}; // id -> [cells]
-
-function buildGrid(){
-  grid.innerHTML="";
-  TRACKS.forEach(track=>{
-    const row=document.createElement("div"); row.className="track";
-    const head=document.createElement("div"); head.className="track-head";
-    head.innerHTML=`<div class="track-name"><span class="dot" style="background:${track.color}"></span>${track.name}</div>`;
-    const ctrls=document.createElement("div"); ctrls.className="track-ctrls";
-    const mB=document.createElement("button"); mB.className="mini mute"; mB.textContent="M";
-    const sB=document.createElement("button"); sB.className="mini"; sB.textContent="S";
-    mB.onclick=()=>{pat()[track.id].mute=!pat()[track.id].mute; mB.classList.toggle("active",pat()[track.id].mute);};
-    sB.onclick=()=>{pat()[track.id].solo=!pat()[track.id].solo; sB.classList.toggle("active",pat()[track.id].solo);};
-    ctrls.append(mB,sB); head.append(ctrls); row.append(head);
-
-    const steps=document.createElement("div"); steps.className="steps";
-    cellEls[track.id]=[];
-    for(let i=0;i<STEPS;i++){
-      const c=document.createElement("div");
-      c.className="cell"+((Math.floor(i/4)%2===0)?" beat":"");
-      c.dataset.step=i;
-      if(track.pitched){ const nn=document.createElement("div"); nn.className="note"; c.append(nn); }
-      attachCell(c, track, i);
-      steps.append(c); cellEls[track.id].push(c);
-    }
-    row.append(steps); grid.append(row);
-  });
-  renderPattern();
-}
-
-/* cell interaction: tap toggle; drag vertical to change note on pitched */
-function attachCell(c, track, i){
-  let startY=0, startNote=0, moved=false, dragging=false, activeId=null;
-  const p=()=>pat()[track.id];
-
-  const onDown=(e)=>{
-    e.preventDefault();
-    dragging=true; moved=false;
-    const y=(e.touches?e.touches[0].clientY:e.clientY);
-    startY=y; startNote=p().note[i]; activeId=e.pointerId;
-    if(track.pitched && p().on[i]){ /* prepare to drag pitch */ }
+/* build presets */
+let selPreset=null;
+PRESETS.forEach((pre,i)=>{
+  const b=document.createElement("button"); b.className="chip"; b.textContent=pre.name;
+  b.onclick=()=>{
+    document.querySelectorAll(".chip").forEach(c=>c.classList.remove("sel"));
+    b.classList.add("sel"); selPreset=i; promptEl.value=pre.p;
   };
-  const onMove=(e)=>{
-    if(!dragging||!track.pitched) return;
-    const y=(e.touches?e.touches[0].clientY:e.clientY);
-    const dy=startY-y;
-    if(Math.abs(dy)>6){ moved=true;
-      if(!p().on[i]) p().on[i]=true;
-      const scaleLen=SCALES[state.scale].length;
-      let nn=startNote+Math.round(dy/12);
-      nn=Math.max(0,Math.min(scaleLen*3-1,nn));
-      p().note[i]=nn; paintCell(track,i);
-    }
-  };
-  const onUp=(e)=>{
-    if(!dragging) return; dragging=false;
-    if(!moved){ // tap = toggle
-      p().on[i]=!p().on[i];
-      if(track.pitched && p().on[i] && p().note[i]===0) p().note[i]= track.id==="lead"?7:0;
-      paintCell(track,i);
-    }
-  };
-  c.addEventListener("touchstart",onDown,{passive:false});
-  c.addEventListener("touchmove",onMove,{passive:false});
-  c.addEventListener("touchend",onUp);
-  c.addEventListener("mousedown",onDown);
-  window.addEventListener("mousemove",(e)=>{if(dragging)onMove(e);});
-  window.addEventListener("mouseup",(e)=>{if(dragging)onUp(e);});
-}
-
-function scaleDegName(track, degIndex){
-  const scale=SCALES[state.scale], root=KEYS[state.key];
-  const octaveBase=(track.baseOct||2);
-  const oct=Math.floor(degIndex/scale.length);
-  const deg=((degIndex%scale.length)+scale.length)%scale.length;
-  const semis=(scale[deg]+root)%12;
-  return NOTE_NAMES[semis]+(octaveBase+oct);
-}
-function paintCell(track,i){
-  const c=cellEls[track.id][i]; const p=pat()[track.id];
-  c.classList.toggle("on",p.on[i]);
-  c.style.color = p.on[i]?track.color:"";
-  c.style.background = p.on[i]?track.color:"";
-  if(!p.on[i]) c.style.background=""; // revert handled by class
-  if(track.pitched){
-    const nn=c.querySelector(".note");
-    nn.textContent = p.on[i]?scaleDegName(track,p.note[i]):"";
-    nn.style.color = p.on[i]?"#0a0a0f":"";
-  }
-  if(!p.on[i]){ c.style.background=""; c.style.color=""; }
-}
-function renderPattern(){
-  TRACKS.forEach(track=>{
-    for(let i=0;i<STEPS;i++) paintCell(track,i);
-    const p=pat()[track.id];
-    // reflect mute/solo buttons
-  });
-  // refresh mute/solo button states
-  document.querySelectorAll(".track").forEach((row,idx)=>{
-    const track=TRACKS[idx]; const p=pat()[track.id];
-    const [mB,sB]=row.querySelectorAll(".mini");
-    mB.classList.toggle("active",p.mute); sB.classList.toggle("active",p.solo);
-  });
-}
-function paintPlayhead(step){
-  document.querySelectorAll(".cell.playhead").forEach(c=>c.classList.remove("playhead"));
-  TRACKS.forEach(track=>{ cellEls[track.id][step].classList.add("playhead"); });
-  state.curStep=step;
-}
-
-/* ============================================================================
-   FX PANEL
-   ========================================================================== */
-const FX_UI=[
-  {k:"drive", label:"808 Distortion", fmt:v=>Math.round(v*100)+"%"},
-  {k:"sub",   label:"808 Sub",        fmt:v=>Math.round(v*100)+"%"},
-  {k:"glide", label:"808 Glide",      fmt:v=>Math.round(v*100)+"%"},
-  {k:"punch", label:"Kick Punch",     fmt:v=>Math.round(v*100)+"%"},
-  {k:"reverb",label:"Reverb",         fmt:v=>Math.round(v*100)+"%"},
-  {k:"space", label:"Lead Echo",      fmt:v=>Math.round(v*100)+"%"},
-  {k:"leadDetune",label:"Lead Detune",fmt:v=>Math.round(v*100)+"%"},
-  {k:"filter",label:"Master Tone",    fmt:v=>Math.round(v*100)+"%"},
-];
-function buildFX(){
-  const w=document.getElementById("fxwrap"); w.innerHTML="";
-  FX_UI.forEach(item=>{
-    const d=document.createElement("div"); d.className="fx";
-    d.innerHTML=`<h4>${item.label}<span id="fxv_${item.k}">${item.fmt(fx[item.k])}</span></h4>`;
-    const r=document.createElement("input"); r.type="range"; r.min=0; r.max=100; r.value=fx[item.k]*100;
-    r.oninput=()=>{
-      fx[item.k]=r.value/100;
-      document.getElementById("fxv_"+item.k).textContent=item.fmt(fx[item.k]);
-      if(item.k==="filter") applyFilter();
-    };
-    d.append(r); w.append(d);
-  });
-}
-
-/* ============================================================================
-   PATTERN BAR
-   ========================================================================== */
-function buildPatternBar(){
-  const bar=document.getElementById("patternBar"); bar.innerHTML="";
-  const label=document.createElement("div"); label.style.cssText="font-size:9px;color:var(--dim);font-weight:700;letter-spacing:1px;";
-  label.textContent="PATTERN"; bar.append(label);
-  for(let i=0;i<NUM_PATTERNS;i++){
-    const b=document.createElement("button"); b.className="pat"; b.textContent=String.fromCharCode(65+i);
-    b.onclick=()=>{ state.curPattern=i; if(state.playing){schedStep=0;} refreshPatternBar(); renderPattern(); };
-    bar.append(b);
-  }
-  const copy=document.createElement("button"); copy.className="pat"; copy.textContent="⧉"; copy.title="Copy to next";
-  copy.style.color="var(--accent)";
-  copy.onclick=()=>{ const next=(state.curPattern+1)%NUM_PATTERNS; patterns[next]=JSON.parse(JSON.stringify(pat())); toast("Copied to "+String.fromCharCode(65+next)); refreshPatternBar(); };
-  bar.append(copy);
-  refreshPatternBar();
-}
-function patternHasData(i){ return TRACKS.some(t=>patterns[i][t.id].on.some(Boolean)); }
-function refreshPatternBar(){
-  document.querySelectorAll(".pat").forEach((b,i)=>{
-    if(i>=NUM_PATTERNS) return;
-    b.classList.toggle("active",i===state.curPattern);
-    b.classList.toggle("hasdata",patternHasData(i));
-  });
-}
-
-/* ============================================================================
-   GENERATOR — the "make me a rage beat" brain
-   ========================================================================== */
-function rand(a){ return a[Math.floor(Math.random()*a.length)]; }
-function chance(p){ return Math.random()<p; }
-
-function generate(){
-  const p=blankPattern();
-  // tempo & key vibe
-  state.bpm = rand([140,143,146,150,152,155,158,160,132,136]);
-  state.scale = rand(["minor","phrygian","phrygian","minorPent","harmonic"]);
-  syncTransportUI();
-
-  // ---- KICK: sparse, syncopated, follows 808 downbeats ----
-  const kickHits=[0];
-  if(chance(.8)) kickHits.push(rand([6,7,10,11]));
-  if(chance(.6)) kickHits.push(rand([3,4]));
-  if(chance(.5)) kickHits.push(rand([13,14,11]));
-  kickHits.forEach(i=>p.kick.on[i]=true);
-
-  // ---- 808: dark rolling bassline locked to kicks + slides ----
-  const scaleLen=SCALES[state.scale].length;
-  const roots=[0,0,0,3,4,5,-2,2]; // scale degrees (low)
-  let base=rand([0,0,0,3,5]);
-  const e808pos=[...new Set([...kickHits, ...(chance(.6)?[rand([2,6,9,12])]:[])])];
-  e808pos.forEach(i=>{
-    p.e808.on[i]=true;
-    if(chance(.55)) base=Math.max(-2,Math.min(scaleLen, base+rand([-2,-1,0,2,3])));
-    p.e808.note[i]=((base%scaleLen)+scaleLen)%scaleLen;
-  });
-  // occasional slide note between
-  if(chance(.6)){ let s=rand([5,9,13]); if(!p.e808.on[s]){p.e808.on[s]=true; p.e808.note[s]=(base+rand([2,3,4]))%scaleLen;} }
-
-  // ---- SNARE / CLAP on the backbeat (step 4 & 12), sometimes ghost ----
-  const backbeat = rand([[4,12],[8],[4,12]]);
-  backbeat.forEach(i=>{ if(chance(.7)) p.clap.on[i]=true; else p.snare.on[i]=true; });
-  if(chance(.4)) p.snare.on[rand([7,15])]=true;
-  // rare triplet-ish snare roll at the end
-  if(chance(.35)){ [13,14,15].forEach(i=>p.snare.on[i]=true); }
-
-  // ---- HATS: fast trap pattern with rolls ----
-  const density=rand([1,1,2]); // 1 = 8ths mostly, 2 = 16ths
-  for(let i=0;i<STEPS;i++){
-    if(density===2){ p.hat.on[i]=true; }
-    else { if(i%2===0||chance(.35)) p.hat.on[i]=true; }
-  }
-  // hat rolls (double/triple time feel) — cluster
-  const rollStart=rand([6,10,14,2]);
-  for(let i=rollStart;i<Math.min(STEPS,rollStart+2);i++) p.hat.on[i]=true;
-  // open hats for air
-  [rand([2,6,10,14])].forEach(i=>{ if(chance(.7)) p.ohat.on[i]=true; });
-
-  // ---- LEAD melody: sparse dark motif in higher octave ----
-  if(chance(.85)){
-    const motifLen=rand([3,4,5]);
-    const startPositions=[0,3,6,8,11,14];
-    let noteIdx=rand([0,7,4,2]);
-    let placed=0;
-    startPositions.forEach(sp=>{
-      if(placed<motifLen && chance(.7)){
-        p.lead.on[sp]=true;
-        noteIdx=Math.max(0,Math.min(scaleLen*3-1, noteIdx+rand([-3,-2,-1,0,2,3,4])));
-        p.lead.note[sp]=noteIdx; placed++;
-      }
-    });
-  }
-
-  // ---- PERC: light off-grid accents ----
-  if(chance(.6)){ [rand([3,5,9,11])].forEach(i=>p.perc.on[i]=true); }
-
-  // ---- FX vibe presets ----
-  fx.drive = 0.4+Math.random()*0.45;
-  fx.sub   = 0.4+Math.random()*0.4;
-  fx.glide = 0.3+Math.random()*0.5;
-  fx.reverb= 0.35+Math.random()*0.4;
-  fx.space = 0.25+Math.random()*0.4;
-  fx.leadDetune=0.3+Math.random()*0.5;
-  fx.filter= 0.75+Math.random()*0.2;
-  fx.punch = 0.5+Math.random()*0.4;
-  applyFilterMaybe();
-  buildFX();
-
-  patterns[state.curPattern]=p;
-  renderPattern(); refreshPatternBar();
-  toast("New beat 🔥  "+state.key+" "+labelScale(state.scale)+" · "+state.bpm+" BPM");
-}
-function labelScale(s){return {minor:"minor",phrygian:"phrygian",harmonic:"harm.minor",minorPent:"min.pent"}[s];}
-function applyFilterMaybe(){ if(masterFilter) applyFilter(); }
-
-/* ============================================================================
-   TRANSPORT UI SYNC
-   ========================================================================== */
-function syncTransportUI(){
-  document.getElementById("bpmVal").textContent=state.bpm;
-  document.getElementById("swingVal").textContent=state.swing+"%";
-  document.getElementById("key").value=state.key;
-  document.getElementById("scale").value=state.scale;
-  if(ctx) setDelayTime();
-}
-
-/* ============================================================================
-   CONTROLS WIRING
-   ========================================================================== */
-document.getElementById("play").onclick=togglePlay;
-document.getElementById("gen").onclick=async ()=>{ await ensureCtx(); generate(); };
-document.getElementById("clear").onclick=()=>{ patterns[state.curPattern]=blankPattern(); renderPattern(); refreshPatternBar(); toast("Cleared "+String.fromCharCode(65+state.curPattern)); };
-document.querySelectorAll("[data-bpm]").forEach(b=>b.onclick=()=>{ state.bpm=Math.max(70,Math.min(200,state.bpm+ +b.dataset.bpm)); syncTransportUI(); });
-document.querySelectorAll("[data-swing]").forEach(b=>b.onclick=()=>{ state.swing=Math.max(0,Math.min(60,state.swing+ +b.dataset.swing)); syncTransportUI(); });
-document.getElementById("key").onchange=e=>{ state.key=e.target.value; renderPattern(); };
-document.getElementById("scale").onchange=e=>{ state.scale=e.target.value; renderPattern(); };
-
-let taps=[];
-document.getElementById("tap").onclick=()=>{
-  const now=performance.now(); taps.push(now); taps=taps.filter(t=>now-t<2000);
-  if(taps.length>=2){ let sum=0; for(let i=1;i<taps.length;i++) sum+=taps[i]-taps[i-1];
-    const avg=sum/(taps.length-1); state.bpm=Math.max(70,Math.min(200,Math.round(60000/avg))); syncTransportUI(); }
-};
-let muted=false, savedMaster=0.9;
-document.getElementById("master").onclick=()=>{
-  if(!ctx) return; muted=!muted;
-  master.gain.setTargetAtTime(muted?0:savedMaster, ctx.currentTime,0.02);
-  document.getElementById("master").textContent=muted?"🔇":"🔊";
-};
-
-function toast(msg){ const t=document.getElementById("toast"); t.textContent=msg; t.classList.add("show"); clearTimeout(t._h); t._h=setTimeout(()=>t.classList.remove("show"),1600); }
-
-/* keyboard for desktop testing */
-window.addEventListener("keydown",e=>{
-  if(e.code==="Space"){e.preventDefault();togglePlay();}
-  if(e.key==="g"||e.key==="G"){ ensureCtx().then(generate); }
+  presetsEl.append(b);
 });
 
-/* ============================================================================
-   INIT
-   ========================================================================== */
-buildGrid(); buildFX(); buildPatternBar(); syncTransportUI();
-// seed an initial beat so the app is never empty
-(function seed(){
-  const p=blankPattern();
-  [0,7,10].forEach(i=>p.kick.on[i]=true);
-  [0,7,10].forEach(i=>{p.e808.on[i]=true;p.e808.note[i]=0;});
-  p.e808.note[7]=3; p.e808.note[10]=5;
-  [4,12].forEach(i=>p.clap.on[i]=true);
-  for(let i=0;i<STEPS;i++) if(i%2===0||i===6||i===14) p.hat.on[i]=true;
-  p.ohat.on[10]=true;
-  [0,6,8].forEach((i,k)=>{p.lead.on[i]=true;p.lead.note[i]=[7,10,8][k];});
-  patterns[0]=p;
-})();
-renderPattern(); refreshPatternBar();
-requestAnimationFrame(drawLoop);
+lenEl.oninput=()=>{ lenVal.textContent=lenEl.value+"s"; };
 
-/* service worker for offline install */
+/* restore last prompt */
+promptEl.value = LS.get("lastPrompt","");
+
+/* ---- Settings modal ---- */
+const modal=$("#modal");
+function openModal(){ syncModal(); modal.classList.add("open"); }
+function closeModal(){ modal.classList.remove("open"); }
+$("#gearBtn").onclick=openModal;
+$("#closeBtn").onclick=closeModal;
+modal.addEventListener("click",e=>{ if(e.target===modal) closeModal(); });
+
+function syncModal(){
+  $("#proxyUrl").value=cfg.proxyUrl;
+  $("#apiKey").value=cfg.apiKey;
+  $("#modelId").value=cfg.modelId||"music_v1";
+  document.querySelectorAll("#seg button").forEach(b=>b.classList.toggle("on",b.dataset.mode===cfg.mode));
+  $("#panel-proxy").classList.toggle("show",cfg.mode==="proxy");
+  $("#panel-direct").classList.toggle("show",cfg.mode==="direct");
+}
+document.querySelectorAll("#seg button").forEach(b=>{
+  b.onclick=()=>{ cfg.mode=b.dataset.mode; syncModal(); };
+});
+$("#saveBtn").onclick=()=>{
+  cfg.proxyUrl=$("#proxyUrl").value.trim().replace(/\/+$/,"");
+  cfg.apiKey=$("#apiKey").value.trim();
+  cfg.modelId=($("#modelId").value.trim()||"music_v1");
+  LS.set("mode",cfg.mode); LS.set("proxyUrl",cfg.proxyUrl); LS.set("apiKey",cfg.apiKey); LS.set("modelId",cfg.modelId);
+  closeModal(); refreshSetupBanner();
+  setStatus('<span class="ok">Saved. Ready to generate.</span>');
+};
+
+function isConfigured(){
+  return cfg.mode==="proxy" ? !!cfg.proxyUrl : !!cfg.apiKey;
+}
+function refreshSetupBanner(){ $("#setupBanner").classList.toggle("hide", isConfigured()); }
+refreshSetupBanner();
+
+function setStatus(html){ statusEl.innerHTML=html; }
+
+/* ---- Generation ---- */
+genBtn.onclick=generate;
+
+async function generate(){
+  const prompt=promptEl.value.trim();
+  if(!prompt){ setStatus('<span class="err">Type a vibe or pick a preset first.</span>'); return; }
+  if(!isConfigured()){ setStatus('<span class="err">Connect your API first — tap ⚙︎.</span>'); openModal(); return; }
+
+  LS.set("lastPrompt",prompt);
+  const lengthMs=parseInt(lenEl.value,10)*1000;
+
+  genBtn.disabled=true;
+  const t0=Date.now();
+  let timer=setInterval(()=>{
+    const s=Math.floor((Date.now()-t0)/1000);
+    setStatus('<span class="spinner"></span>Generating your beat… '+s+'s (usually 20–60s)');
+  },400);
+
+  try{
+    const blob=await requestBeat(prompt,lengthMs);
+    clearInterval(timer);
+    const secs=Math.floor((Date.now()-t0)/1000);
+    setStatus('<span class="ok">Done in '+secs+'s 🔥</span>');
+    addResult(blob,prompt,lengthMs);
+  }catch(err){
+    clearInterval(timer);
+    console.error(err);
+    setStatus('<span class="err">'+escapeHtml(friendlyError(err))+'</span>');
+  }finally{
+    genBtn.disabled=false;
+  }
+}
+
+async function requestBeat(prompt,lengthMs){
+  const body=JSON.stringify({ prompt, music_length_ms:lengthMs, model_id:cfg.modelId||"music_v1" });
+  let url, headers;
+  if(cfg.mode==="proxy"){
+    url=cfg.proxyUrl; headers={ "Content-Type":"application/json" };
+  }else{
+    url="https://api.elevenlabs.io/v1/music?output_format=mp3_44100_128";
+    headers={ "Content-Type":"application/json", "xi-api-key":cfg.apiKey };
+  }
+  const res=await fetch(url,{ method:"POST", headers, body });
+  if(!res.ok){
+    let detail="";
+    try{ const j=await res.json(); detail = j.detail?.message || j.detail || j.message || JSON.stringify(j); }
+    catch(_){ try{ detail=await res.text(); }catch(__){} }
+    const e=new Error("HTTP "+res.status+(detail?(" — "+detail):"")); e.status=res.status; throw e;
+  }
+  const ctype=res.headers.get("content-type")||"";
+  if(ctype.includes("application/json")){
+    // some proxies/endpoints return JSON with a URL or base64
+    const j=await res.json();
+    if(j.audio_url) { const r=await fetch(j.audio_url); return await r.blob(); }
+    if(j.audio_base64 || j.audio){ return b64ToBlob(j.audio_base64||j.audio); }
+    throw new Error("Unexpected JSON response (no audio).");
+  }
+  return await res.blob();
+}
+
+function b64ToBlob(b64){
+  const bin=atob(b64); const arr=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+  return new Blob([arr],{type:"audio/mpeg"});
+}
+
+let trackCount=0;
+function addResult(blob,prompt,lengthMs){
+  trackCount++;
+  const url=URL.createObjectURL(blob);
+  const stamp=new Date();
+  const name="rage-beat-"+String(trackCount).padStart(2,"0");
+  const div=document.createElement("div"); div.className="track";
+  div.innerHTML=`
+    <h3>🔥 ${name}</h3>
+    <div class="meta">${(lengthMs/1000)|0}s · ${stamp.toLocaleTimeString()} · ${escapeHtml(prompt.slice(0,90))}${prompt.length>90?"…":""}</div>
+    <audio controls preload="metadata" src="${url}"></audio>
+    <div class="acts">
+      <a class="dl" href="${url}" download="${name}.mp3">⬇ Download</a>
+      <button class="regen">↻ Regenerate</button>
+    </div>`;
+  div.querySelector(".regen").onclick=()=>{ promptEl.value=prompt; lenEl.value=Math.min(120,Math.max(10,(lengthMs/1000)|0)); lenVal.textContent=lenEl.value+"s"; generate(); };
+  resultsEl.prepend(div);
+  // autoplay newest (best-effort; iOS may require a tap)
+  const a=div.querySelector("audio"); a.play().catch(()=>{});
+}
+
+function friendlyError(err){
+  const m=(err&&err.message)||String(err);
+  if(m==="Failed to fetch" || /NetworkError|Load failed/i.test(m)){
+    if(cfg.mode==="direct") return "Blocked by the browser (CORS) or network. Switch to Proxy mode in ⚙︎ — that fixes it.";
+    return "Couldn't reach your Worker. Check the Proxy URL in ⚙︎ and that the Worker is deployed.";
+  }
+  if(err.status===401||/invalid api key|unauthor/i.test(m)) return "API key rejected (401). Check your key in ⚙︎.";
+  if(err.status===402||/quota|credit|payment/i.test(m)) return "Out of ElevenLabs credits (402). Add credits to your account.";
+  if(err.status===422) return "The service rejected the request (422): "+m;
+  if(err.status===429) return "Rate limited (429). Wait a moment and try again.";
+  return m;
+}
+function escapeHtml(s){ return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c])); }
+
+/* first-run: open settings if not configured */
+if(!isConfigured()){ setTimeout(openModal, 600); }
+
+/* service worker */
 if("serviceWorker" in navigator){
   window.addEventListener("load",()=>navigator.serviceWorker.register("sw.js").catch(()=>{}));
 }

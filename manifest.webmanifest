@@ -1,7 +1,7 @@
 {
-  "name": "RAGE — Underground Beat Maker",
-  "short_name": "RAGE",
-  "description": "Make dark underground rap / rage-type beats (Ken Carson, Vax style) right on your phone.",
+  "name": "RAGE AI — Beat Generator",
+  "short_name": "RAGE AI",
+  "description": "Generate real underground rap / rage beats (Ken Carson, Vax style) from a prompt with AI, on your phone.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
