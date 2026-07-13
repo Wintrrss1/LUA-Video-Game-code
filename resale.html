@@ -1,0 +1,480 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no" />
+<meta name="theme-color" content="#0a0a0f" />
+<title>BidFTA Resale Finder</title>
+
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Resale Finder" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="icon-180.png" />
+<link rel="icon" href="icon.svg" type="image/svg+xml" />
+
+<style>
+  :root{
+    --bg:#08080c; --panel:#111119; --panel2:#171722; --line:#23233a;
+    --txt:#e9e9f5; --dim:#8a8aa5; --accent:#37c978; --accent2:#2ea6ff;
+    --gold:#ffcc4d; --bad:#ff6b6b;
+  }
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+  html,body{margin:0;min-height:100%;background:var(--bg);color:var(--txt);
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,system-ui,sans-serif;
+    overscroll-behavior-y:none;}
+  body{display:flex;flex-direction:column;
+    padding:env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);}
+  input,textarea,button,select{font-family:inherit;}
+  ::selection{background:var(--accent);color:#04120a;}
+
+  header{padding:12px 16px;display:flex;align-items:center;gap:10px;border-bottom:1px solid var(--line);
+    background:linear-gradient(180deg,#12121c,#0b0b12);position:sticky;top:0;z-index:20;}
+  .logo{font-weight:800;letter-spacing:1px;font-size:18px;
+    background:linear-gradient(90deg,var(--accent),var(--accent2));-webkit-background-clip:text;background-clip:text;color:transparent;}
+  .logo small{display:block;font-size:9px;letter-spacing:3px;color:var(--dim);font-weight:600;-webkit-text-fill-color:var(--dim);}
+  header .spacer{flex:1;}
+  .gear{background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:9px 12px;font-size:16px;color:var(--txt);}
+
+  main{flex:1;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:14px 14px 40px;max-width:720px;width:100%;margin:0 auto;}
+
+  .banner{background:linear-gradient(135deg,#0f2a1a,#101c22);border:1px solid var(--accent);border-radius:14px;
+    padding:12px 14px;font-size:12.5px;line-height:1.5;color:#d9ffe9;margin-bottom:16px;}
+  .banner b{color:#fff;}
+  .banner.hide{display:none;}
+
+  label.fld{display:block;font-size:11px;letter-spacing:1px;color:var(--dim);font-weight:700;margin:8px 2px 7px;text-transform:uppercase;}
+
+  .searchrow{display:flex;gap:8px;}
+  .searchrow input{flex:1;background:var(--panel2);border:1px solid var(--line);border-radius:14px;
+    color:var(--txt);font-size:15px;padding:14px;}
+  .searchrow input:focus{outline:none;border-color:var(--accent);}
+  .gobtn{border:none;border-radius:14px;font-size:15px;font-weight:800;padding:0 20px;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));color:#04120a;cursor:pointer;}
+  .gobtn:active{transform:scale(.98);}
+  .gobtn:disabled{opacity:.55;}
+
+  .controls{display:none;gap:8px;flex-wrap:wrap;margin-top:14px;align-items:center;}
+  .controls.show{display:flex;}
+  .controls select,.controls input[type=text]{background:var(--panel2);border:1px solid var(--line);border-radius:10px;
+    color:var(--txt);font-size:13px;padding:9px 10px;}
+  .controls input[type=text]{flex:1;min-width:120px;}
+  .controls label.chk{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--dim);font-weight:600;}
+
+  .status{margin-top:16px;font-size:13px;color:var(--dim);text-align:center;min-height:20px;line-height:1.5;}
+  .status .err{color:var(--bad);}
+  .status .ok{color:var(--accent);}
+  .spinner{display:inline-block;width:16px;height:16px;border:2px solid var(--line);border-top-color:var(--accent);
+    border-radius:50%;animation:spin .8s linear infinite;vertical-align:-3px;margin-right:6px;}
+  @keyframes spin{to{transform:rotate(360deg)}}
+
+  .results{margin-top:18px;}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:12px;margin-bottom:12px;display:flex;gap:12px;}
+  .card.closed{opacity:.55;}
+  .thumb{width:84px;height:84px;flex-shrink:0;border-radius:12px;object-fit:cover;background:var(--panel2);border:1px solid var(--line);}
+  .card .body{flex:1;min-width:0;}
+  .card h3{margin:0 0 4px;font-size:14px;font-weight:700;line-height:1.35;}
+  .card .cond{font-size:11px;color:var(--dim);margin-bottom:8px;}
+  .card .cond .lot{color:var(--accent2);}
+
+  .figs{display:flex;flex-wrap:wrap;gap:6px 14px;font-size:12px;margin-bottom:10px;}
+  .figs .fig b{display:block;font-size:15px;font-weight:800;line-height:1.2;}
+  .figs .fig span{font-size:10px;letter-spacing:.5px;color:var(--dim);text-transform:uppercase;}
+  .fig.msrp b{color:var(--gold);}
+  .fig.bid b{color:var(--txt);}
+  .fig.margin b{color:var(--accent);}
+  .fig.margin.neg b{color:var(--bad);}
+
+  .acts{display:flex;gap:8px;}
+  .acts a{flex:1;text-align:center;background:var(--panel2);border:1px solid var(--line);
+    color:var(--txt);border-radius:10px;padding:9px;font-size:12px;font-weight:700;text-decoration:none;}
+  .acts a.ebay{background:linear-gradient(135deg,var(--accent2),#1d7fd6);border:none;color:#fff;}
+
+  .foot{margin-top:28px;padding-top:16px;border-top:1px solid var(--line);font-size:12px;color:var(--dim);line-height:1.6;text-align:center;}
+  .foot a{color:var(--accent);text-decoration:none;}
+
+  /* settings modal */
+  .modal{position:fixed;inset:0;background:#000c;backdrop-filter:blur(4px);z-index:50;display:none;align-items:flex-end;justify-content:center;}
+  .modal.open{display:flex;}
+  .sheet{background:var(--panel);border:1px solid var(--line);border-radius:20px 20px 0 0;width:100%;max-width:720px;
+    padding:18px 16px calc(24px + env(safe-area-inset-bottom));max-height:92vh;overflow-y:auto;}
+  .sheet h2{margin:0 0 4px;font-size:17px;}
+  .sheet p.sub{margin:0 0 14px;font-size:12px;color:var(--dim);line-height:1.5;}
+  .seg{display:flex;background:var(--panel2);border:1px solid var(--line);border-radius:12px;padding:4px;margin-bottom:14px;}
+  .seg button{flex:1;background:transparent;border:none;color:var(--dim);padding:10px;border-radius:9px;font-size:13px;font-weight:700;cursor:pointer;}
+  .seg button.on{background:linear-gradient(135deg,var(--accent),var(--accent2));color:#04120a;}
+  .sheet label{display:block;font-size:11px;letter-spacing:1px;color:var(--dim);font-weight:700;margin:12px 2px 6px;text-transform:uppercase;}
+  .sheet input[type=text]{width:100%;background:var(--panel2);border:1px solid var(--line);
+    border-radius:12px;color:var(--txt);font-size:14px;padding:13px;}
+  .sheet input:focus{outline:none;border-color:var(--accent);}
+  .sheet .help{font-size:11px;color:var(--dim);line-height:1.5;margin-top:6px;}
+  .sheet .help a{color:var(--accent);}
+  .sheet .save{width:100%;margin-top:18px;padding:15px;border:none;border-radius:14px;font-size:15px;font-weight:800;
+    background:linear-gradient(135deg,var(--accent),var(--accent2));color:#04120a;cursor:pointer;}
+  .sheet .close{width:100%;margin-top:8px;padding:13px;border:1px solid var(--line);border-radius:14px;font-size:14px;
+    background:transparent;color:var(--dim);cursor:pointer;}
+  .mode-panel{display:none;}
+  .mode-panel.show{display:block;}
+  code{background:#000;border:1px solid var(--line);border-radius:5px;padding:1px 5px;font-size:11px;color:var(--accent2);word-break:break-all;}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">RESALE FINDER<small>BIDFTA · MSRP + EBAY</small></div>
+  <div class="spacer"></div>
+  <button class="gear" id="gearBtn" aria-label="Settings">&#9881;</button>
+</header>
+
+<main>
+  <div class="banner" id="banner">
+    Paste a <b>BidFTA auction or item link</b> (or just an auction number) to list every
+    item with its <b>MSRP</b>, <b>current bid</b>, potential margin, and a one-tap
+    <b>eBay sold-price</b> lookup. First time? Tap <b>&#9881;</b> to connect the free proxy.
+  </div>
+
+  <label class="fld" for="q">Auction link, item link, or auction #</label>
+  <div class="searchrow">
+    <input id="q" type="text" inputmode="url" autocomplete="off" autocapitalize="off" spellcheck="false"
+      placeholder="e.g. bidfta.com/283423 or 283423" />
+    <button class="gobtn" id="goBtn">Load</button>
+  </div>
+
+  <div class="controls" id="controls">
+    <select id="sortSel">
+      <option value="margin">Sort: Best margin</option>
+      <option value="pct">Sort: Lowest bid % of MSRP</option>
+      <option value="ending">Sort: Ending soonest</option>
+      <option value="msrp">Sort: Highest MSRP</option>
+    </select>
+    <input id="filter" type="text" placeholder="Filter by keyword…" />
+    <label class="chk"><input type="checkbox" id="hideClosed" /> Hide closed</label>
+  </div>
+
+  <div class="status" id="status"></div>
+  <div class="results" id="results"></div>
+
+  <div class="foot">
+    MSRP &amp; bids are pulled live from BidFTA. eBay figures come from eBay's own
+    <b>Sold &amp; Completed</b> search — tap <b>eBay Sold</b> on any item to see real
+    resale prices. &nbsp;·&nbsp; <a href="./index.html">RAGE AI &rarr;</a>
+  </div>
+</main>
+
+<!-- Settings sheet -->
+<div class="modal" id="modal">
+  <div class="sheet">
+    <h2>Connect BidFTA</h2>
+    <p class="sub">BidFTA's data isn't reachable straight from a browser (no CORS). A tiny
+      free Cloudflare Worker fixes that. No API key needed.</p>
+
+    <div class="seg" id="seg">
+      <button data-mode="proxy" class="on">Proxy (recommended)</button>
+      <button data-mode="direct">Direct</button>
+    </div>
+
+    <div class="mode-panel show" id="panel-proxy">
+      <label>Worker / Proxy URL</label>
+      <input id="workerUrl" type="text" inputmode="url" autocomplete="off" autocapitalize="off"
+        spellcheck="false" placeholder="https://bidfta-proxy.YOURNAME.workers.dev" />
+      <div class="help">Deploy <code>bidfta-worker.js</code> from this repo to a free Cloudflare
+        Worker, then paste its URL here. Full steps in <a href="./BIDFTA_SETUP.md">BIDFTA_SETUP.md</a>.</div>
+    </div>
+
+    <div class="mode-panel" id="panel-direct">
+      <div class="help">Direct mode calls BidFTA with no proxy. It usually fails in the browser
+        (blocked by CORS) but is here as a fallback if you run the page somewhere without that
+        restriction. If loads fail, switch back to <b>Proxy</b>.</div>
+    </div>
+
+    <button class="save" id="saveBtn">Save</button>
+    <button class="close" id="closeBtn">Close</button>
+  </div>
+</div>
+
+<script>
+/* ============================ config / storage ============================ */
+const CFG_KEY = "bidfta_cfg";
+function loadCfg(){
+  try { return JSON.parse(localStorage.getItem(CFG_KEY)) || {}; } catch(e){ return {}; }
+}
+function saveCfg(c){ localStorage.setItem(CFG_KEY, JSON.stringify(c)); }
+let cfg = Object.assign({ mode:"proxy", workerUrl:"" }, loadCfg());
+
+/* ============================ pure helpers =============================== */
+// Extract the numeric auction id from a pasted URL / id string.
+function parseAuctionId(input){
+  if(!input) return null;
+  const s = String(input).trim();
+  if(/^\d+$/.test(s)) return s;                       // bare id
+  const m = s.match(/bidfta\.com\/(\d+)/i);            // .../{auctionId}/...
+  if(m) return m[1];
+  const any = s.match(/\d{3,}/);                       // first long number
+  return any ? any[0] : null;
+}
+
+// Words that add noise to an eBay search built from a BidFTA lot title.
+const EBAY_STOP = new Set(("lot lots box boxes pallet skid row rows assorted miscellaneous misc " +
+  "items item bid bidding per entire you are on of and the a an to may be new open openbox " +
+  "qty quantity total count ct pcs pc pieces piece each ea used damaged untested overstock " +
+  "return returns customer").split(" "));
+
+// Reduce a title to de-duplicated words, dropping punctuation. `stop` toggles
+// whether stop-words / tiny counts are filtered out.
+function titleWords(title, stop){
+  let base = String(title || "").replace(/\([^)]*\)/g, " ");  // drop "( 25 boxes total )"
+  base = base.replace(/[^\w\s]/g, " ");                        // all punctuation -> space
+  const seen = new Set(), words = [];
+  for(const t of base.split(/\s+/)){
+    if(!t) continue;
+    const low = t.toLowerCase();
+    if(stop && EBAY_STOP.has(low)) continue;
+    if(stop && /^\d+$/.test(t) && t.length <= 3) continue;     // drop small standalone counts
+    if(seen.has(low)) continue;
+    seen.add(low); words.push(t);
+    if(words.length >= 8) break;                               // keep it short & relevant
+  }
+  return words;
+}
+
+// Build a clean eBay query string from a noisy BidFTA title (+ optional brand/model).
+function cleanEbayQuery(title, brand, model){
+  let words = titleWords(title, true);
+  if(!words.length) words = titleWords(title, false);          // all-noise lot: use raw words
+  let q = words.join(" ").trim();
+  const b = (brand||"").trim(), md = (model||"").trim();
+  if(b && !q.toLowerCase().includes(b.toLowerCase())) q = (b + " " + q).trim();
+  if(md && !q.toLowerCase().includes(md.toLowerCase())) q = (q + " " + md).trim();
+  return q.slice(0, 90).trim();
+}
+
+function ebayUrl(query){
+  return "https://www.ebay.com/sch/i.html?_nkw=" + encodeURIComponent(query) +
+    "&LH_Sold=1&LH_Complete=1&_ipg=60";
+}
+function itemDetailUrl(auctionId, itemId){
+  return "https://www.bidfta.com/" + auctionId + "/item-detail/" + itemId;
+}
+
+// Margin math for one item. Returns {margin, pct} or nulls when MSRP unknown.
+function marginInfo(msrp, bid){
+  const m = Number(msrp) || 0, b = Number(bid) || 0;
+  if(m <= 0) return { margin:null, pct:null };
+  return { margin: m - b, pct: Math.round((b / m) * 100) };
+}
+
+function money(n){
+  if(n == null || n === "") return "—";
+  const v = Number(n);
+  if(!isFinite(v)) return "—";
+  return "$" + v.toLocaleString(undefined,{minimumFractionDigits:0,maximumFractionDigits:2});
+}
+
+// Normalize one raw BidFTA item object into what the UI needs.
+function normItem(raw, auctionId){
+  let pic = raw.imageUrl || "";
+  const pics = raw.pictures || raw.pictureList;
+  if(!pic && Array.isArray(pics) && pics.length){
+    const first = pics[0];
+    pic = typeof first === "string" ? first : (first && (first.url || first.imageUrl || first.picUrl)) || "";
+  }
+  return {
+    id: raw.id != null ? raw.id : (raw.itemId != null ? raw.itemId : ""),
+    auctionId: raw.auctionId || auctionId,
+    title: raw.title || raw.itemName || raw.name || "Untitled item",
+    msrp: Number(raw.msrp) || 0,
+    bid: Number(raw.currentBid) || 0,
+    bids: Number(raw.bidsCount) || 0,
+    cond: raw.condition || "",
+    brand: raw.brand || "",
+    model: raw.model || "",
+    lot: raw.lotCode || "",
+    pic,
+    closed: !!raw.itemClosed,
+    endMs: raw.utcEndDateTime ? Date.parse(raw.utcEndDateTime) : Infinity,
+  };
+}
+
+/* ============================ networking ================================= */
+async function bftaApi(url){
+  let fetchUrl;
+  if(cfg.mode === "proxy"){
+    if(!cfg.workerUrl) throw new Error("No proxy URL set — tap the gear to connect one.");
+    fetchUrl = cfg.workerUrl.replace(/\/+$/,"") + "?url=" + encodeURIComponent(url);
+  } else {
+    fetchUrl = url;
+  }
+  const res = await fetch(fetchUrl, { headers:{ "Accept":"application/json" } });
+  const text = await res.text();
+  if(!res.ok) throw new Error("BidFTA returned " + res.status + (text ? (" — " + text.slice(0,120)) : ""));
+  try { return JSON.parse(text); }
+  catch(e){ throw new Error("Unexpected (non-JSON) response — check the proxy URL."); }
+}
+
+const PAGE_SIZE = 24;
+function countUrl(id){ return "https://auction.bidfta.io/api/item/getItemsCountByAuctionId/" + id + "?pageId=1&auctionId=" + id; }
+function itemsUrl(id, page){ return "https://auction.bidfta.io/api/item/getItemsByAuctionId/" + id + "?pageId=" + page + "&auctionId=" + id; }
+
+/* ============================ state / render ============================= */
+let ALL = [];         // all normalized items for the current auction
+let CUR_AUCTION = "";
+
+const $ = (id) => document.getElementById(id);
+const statusEl = $("status"), resultsEl = $("results"), controlsEl = $("controls");
+
+function setStatus(html){ statusEl.innerHTML = html; }
+
+function visibleItems(){
+  const q = ($("filter").value || "").trim().toLowerCase();
+  const hideClosed = $("hideClosed").checked;
+  let list = ALL.filter(it => {
+    if(hideClosed && it.closed) return false;
+    if(q && !(it.title.toLowerCase().includes(q) || it.brand.toLowerCase().includes(q) || String(it.lot).toLowerCase().includes(q))) return false;
+    return true;
+  });
+  const sort = $("sortSel").value;
+  list.sort((a,b) => {
+    if(sort === "margin") return (marginInfo(b.msrp,b.bid).margin ?? -1e9) - (marginInfo(a.msrp,a.bid).margin ?? -1e9);
+    if(sort === "pct")    return (marginInfo(a.msrp,a.bid).pct ?? 1e9) - (marginInfo(b.msrp,b.bid).pct ?? 1e9);
+    if(sort === "ending") return a.endMs - b.endMs;
+    if(sort === "msrp")   return b.msrp - a.msrp;
+    return 0;
+  });
+  return list;
+}
+
+function render(){
+  const list = visibleItems();
+  if(!list.length){ resultsEl.innerHTML = ""; return; }
+  const frag = document.createDocumentFragment();
+  for(const it of list){
+    const mi = marginInfo(it.msrp, it.bid);
+    const card = document.createElement("div");
+    card.className = "card" + (it.closed ? " closed" : "");
+
+    const img = document.createElement("img");
+    img.className = "thumb"; img.loading = "lazy"; img.alt = "";
+    if(it.pic) img.src = it.pic;
+    card.appendChild(img);
+
+    const body = document.createElement("div");
+    body.className = "body";
+
+    const h = document.createElement("h3"); h.textContent = it.title; body.appendChild(h);
+
+    const cond = document.createElement("div"); cond.className = "cond";
+    cond.innerHTML = (it.cond ? it.cond : "Condition n/a") +
+      (it.lot ? ' · <span class="lot">Lot ' + it.lot + "</span>" : "") +
+      (it.closed ? " · CLOSED" : "");
+    body.appendChild(cond);
+
+    const figs = document.createElement("div"); figs.className = "figs";
+    figs.innerHTML =
+      '<div class="fig msrp"><b>' + (it.msrp>0?money(it.msrp):"—") + '</b><span>MSRP</span></div>' +
+      '<div class="fig bid"><b>' + money(it.bid) + '</b><span>Bid' + (it.bids?(" · "+it.bids):"") + '</span></div>' +
+      (mi.margin!=null
+        ? '<div class="fig margin ' + (mi.margin<0?"neg":"") + '"><b>' + money(mi.margin) + '</b><span>Margin · ' + mi.pct + '% of MSRP</span></div>'
+        : '');
+    body.appendChild(figs);
+
+    const acts = document.createElement("div"); acts.className = "acts";
+    const ebay = document.createElement("a");
+    ebay.className = "ebay"; ebay.target = "_blank"; ebay.rel = "noopener";
+    ebay.href = ebayUrl(cleanEbayQuery(it.title, it.brand, it.model));
+    ebay.textContent = "eBay Sold";
+    const view = document.createElement("a");
+    view.target = "_blank"; view.rel = "noopener";
+    view.href = itemDetailUrl(it.auctionId, it.id);
+    view.textContent = "View on BidFTA";
+    acts.appendChild(ebay); acts.appendChild(view);
+    body.appendChild(acts);
+
+    card.appendChild(body);
+    frag.appendChild(card);
+  }
+  resultsEl.innerHTML = "";
+  resultsEl.appendChild(frag);
+}
+
+/* ============================ load flow ================================= */
+async function loadAuction(){
+  const id = parseAuctionId($("q").value);
+  if(!id){ setStatus('<span class="err">Couldn\'t find an auction number in that. Paste a bidfta.com link or the auction #.</span>'); return; }
+  if(cfg.mode === "proxy" && !cfg.workerUrl){ openModal(); setStatus('<span class="err">Connect the free proxy first (gear icon).</span>'); return; }
+
+  ALL = []; CUR_AUCTION = id;
+  resultsEl.innerHTML = ""; controlsEl.classList.remove("show");
+  $("goBtn").disabled = true;
+  setStatus('<span class="spinner"></span> Reading auction ' + id + '…');
+
+  try {
+    let count = 0;
+    try { count = Number(await bftaApi(countUrl(id))) || 0; } catch(e){ /* fall back to paging */ }
+    const maxPages = count > 0 ? Math.ceil(count / PAGE_SIZE) : 50; // hard cap when count unknown
+
+    for(let p = 1; p <= maxPages; p++){
+      let batch;
+      try { batch = await bftaApi(itemsUrl(id, p)); }
+      catch(e){ if(p === 1) throw e; else break; }
+      if(!Array.isArray(batch) || batch.length === 0) break;
+      for(const raw of batch) ALL.push(normItem(raw, id));
+      controlsEl.classList.add("show");
+      render();
+      setStatus('<span class="spinner"></span> Loaded ' + ALL.length + (count?(" / " + count):"") + ' items…');
+      if(batch.length < PAGE_SIZE) break;
+    }
+
+    if(!ALL.length){ setStatus('<span class="err">No items found for auction ' + id + '. It may have ended or the number is off.</span>'); return; }
+    setStatus('<span class="ok">Loaded ' + ALL.length + ' items from auction ' + id + '.</span> Tap <b>eBay Sold</b> on any item for real resale prices.');
+    render();
+  } catch(err){
+    setStatus('<span class="err">' + (err.message || "Load failed") + '</span>');
+  } finally {
+    $("goBtn").disabled = false;
+  }
+}
+
+/* ============================ settings UI =============================== */
+const modal = $("modal");
+function openModal(){
+  $("workerUrl").value = cfg.workerUrl || "";
+  setSegMode(cfg.mode || "proxy");
+  modal.classList.add("open");
+}
+function closeModal(){ modal.classList.remove("open"); }
+function setSegMode(mode){
+  document.querySelectorAll("#seg button").forEach(b => b.classList.toggle("on", b.dataset.mode === mode));
+  $("panel-proxy").classList.toggle("show", mode === "proxy");
+  $("panel-direct").classList.toggle("show", mode === "direct");
+  modal.dataset.mode = mode;
+}
+document.querySelectorAll("#seg button").forEach(b => b.addEventListener("click", () => setSegMode(b.dataset.mode)));
+$("saveBtn").addEventListener("click", () => {
+  cfg.mode = modal.dataset.mode || "proxy";
+  cfg.workerUrl = ($("workerUrl").value || "").trim();
+  saveCfg(cfg); closeModal();
+  setStatus('<span class="ok">Saved.</span> Paste an auction link and tap Load.');
+});
+$("gearBtn").addEventListener("click", openModal);
+$("closeBtn").addEventListener("click", closeModal);
+modal.addEventListener("click", (e) => { if(e.target === modal) closeModal(); });
+
+/* ============================ events ==================================== */
+$("goBtn").addEventListener("click", loadAuction);
+$("q").addEventListener("keydown", (e) => { if(e.key === "Enter") loadAuction(); });
+["sortSel","filter","hideClosed"].forEach(idv => $(idv).addEventListener("input", render));
+
+// Nudge first-time users to set up the proxy.
+if(!cfg.workerUrl && cfg.mode === "proxy"){ /* banner already explains; open on first Load */ }
+
+// Expose pure helpers for automated tests (no effect on normal use).
+window.__bidfta = { parseAuctionId, cleanEbayQuery, ebayUrl, itemDetailUrl, marginInfo, normItem, money };
+
+/* ============================ service worker ============================ */
+if("serviceWorker" in navigator){
+  window.addEventListener("load", () => navigator.serviceWorker.register("./sw.js").catch(()=>{}));
+}
+</script>
+</body>
+</html>

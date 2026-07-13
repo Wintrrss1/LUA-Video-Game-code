@@ -8,10 +8,13 @@ Beats are produced by the **[ElevenLabs Music](https://elevenlabs.io/music-api)*
 licensed, cleared for commercial use), so this needs an ElevenLabs account + API key and uses
 credits per beat.
 
-Two apps live here:
+Three apps live here:
 - **`index.html`** — RAGE AI, the AI beat generator (needs your API key).
 - **`studio.html`** — a free, offline, synthesized beat *maker* (a 16-step drum machine + one-tap
   pattern generator). Lower fidelity, but 100% free and no account.
+- **`resale.html`** — **BidFTA Resale Finder**: paste a [BidFTA](https://www.bidfta.com)
+  auction link and see every item's **MSRP**, current bid, potential margin, and a one-tap
+  **eBay Sold** resale lookup. Setup in **[BIDFTA_SETUP.md](./BIDFTA_SETUP.md)** (free, no API key).
 
 ---
 
@@ -53,6 +56,9 @@ This repo auto-deploys via GitHub Actions. Your live URL is:
 | `worker.js` | Cloudflare Worker proxy for the ElevenLabs Music API |
 | `PROXY_SETUP.md` | Step-by-step key + Worker setup |
 | `studio.html` | Free offline synthesized beat maker |
+| `resale.html` | BidFTA Resale Finder (MSRP + eBay resale for auction items) |
+| `bidfta-worker.js` | Cloudflare Worker proxy for BidFTA's public API |
+| `BIDFTA_SETUP.md` | Step-by-step proxy setup for the Resale Finder |
 | `manifest.webmanifest`, `sw.js`, `icon*` | PWA install + offline shell |
 | `.github/workflows/pages.yml` | Auto-deploy to GitHub Pages |
 

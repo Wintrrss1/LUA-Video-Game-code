@@ -4,6 +4,7 @@ on:
   push:
     branches:
       - claude/rap-beat-generator-app-d143vh
+      - claude/bidfta-resale-value-tool-gxukwq
       - main
   workflow_dispatch:
 

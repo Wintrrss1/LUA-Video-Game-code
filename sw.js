@@ -1,9 +1,10 @@
 /* RAGE beat maker — offline service worker */
-const CACHE = "rage-beat-v3";
+const CACHE = "rage-beat-v4";
 const ASSETS = [
   "./",
   "./index.html",
   "./studio.html",
+  "./resale.html",
   "./manifest.webmanifest",
   "./icon.svg",
   "./icon-180.png",
