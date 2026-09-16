@@ -293,11 +293,17 @@
       ["trick", "gl", "3sh", "4th", "2pt"], "*", "Direct snap to the back with an extra puller. Nobody has the quarterback."),
   ];
 
-  /* motion / shift tags and protections used to dress calls */
-  var MOTIONS = ["Z-Motion", "Jet Shift", "Orbit Motion", "Y-Shift Tight", "Tight Bunch Shift",
-    "Flip Trips", "Swap Release", "Fake Jet Shift", "Slot Over", "Hard Y-Flex"];
-  var PROTECTIONS_DEEP = ["Max Pro (7-man)", "Half-Slide Rt", "Half-Slide Lt", "Slide Lt + RB Kick", "6-Man Fan"];
-  var PROTECTIONS_QUICK = ["3-Step", "Quick 3 + Alert", "Sprint Rt", "Sprint Lt", "Empty 5-Man"];
+  /* ---------- PRE-SNAP ADJUSTMENTS ----------
+     Only things you can actually set in CFB 27's pre-snap menu: put a
+     receiver in motion, flip the play, slide the protection, change a
+     block/release assignment, or hot route somebody. */
+  var RECEIVERS = ["X", "Z", "H", "Y"];
+  var MOTION_DIRS = ["left", "right"];
+  var SLIDE = ["Slide protect Lt", "Slide protect Rt", "Half slide Lt", "Half slide Rt"];
+  var HOT_ROUTES = ["Hot route H \u2192 drag", "Hot route Y \u2192 drag", "Hot route Z \u2192 slant"];
+  var RUN_ADJ = ["Flip play", "Hot route X \u2192 block"];
+  var MIKE = "ID the Mike";
 
-  global.CFB27_PLAYS = { PLAYS: PLAYS, SITS: SITS, MOTIONS: MOTIONS, PROTECTIONS_DEEP: PROTECTIONS_DEEP, PROTECTIONS_QUICK: PROTECTIONS_QUICK };
+  global.CFB27_PLAYS = { PLAYS: PLAYS, SITS: SITS, RECEIVERS: RECEIVERS, MOTION_DIRS: MOTION_DIRS,
+    SLIDE: SLIDE, HOT_ROUTES: HOT_ROUTES, RUN_ADJ: RUN_ADJ, MIKE: MIKE };
 })(typeof window !== "undefined" ? window : globalThis);

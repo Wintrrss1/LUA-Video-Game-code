@@ -203,43 +203,61 @@
     return scored[0].f;
   }
 
+  /* which receiver labels exist in this formation, and who can stay in to block */
+  function personnelOf(form) {
+    var empty = form.fam.indexOf("empty") !== -1;
+    return {
+      rb: !empty && +form.personnel.charAt(0) > 0,
+      te: +form.personnel.charAt(1) > 0,
+      labels: (function () {
+        var l = ["X", "Z"];
+        if (form.fam.some(function (f) {
+          return ["trips", "bunch", "spread", "doubles", "empty", "flex"].indexOf(f) !== -1;
+        })) l.push("H");
+        if (+form.personnel.charAt(1) > 0) l.push("Y");
+        return l;
+      })()
+    };
+  }
+
+  function pick(arr, rnd) { return arr[Math.floor(rnd() * arr.length)]; }
+
+  /* Everything on this line is a real CFB 27 pre-snap adjustment. */
   function dressCall(pl, form, def, offense, rnd, sit) {
+    var per = personnelOf(form);
     var motion = "";
-    var motionChance = offense.style.motion + (def.man > 0.55 ? 0.22 : 0) + (sit === "rz20" || sit === "rz10" ? 0.1 : 0);
-    if (pl.t !== "trick" && rnd() < motionChance) {
-      motion = L.MOTIONS[Math.floor(rnd() * L.MOTIONS.length)];
-      if (form.fam.indexOf("empty") !== -1 && /Jet|Orbit/.test(motion)) motion = "Swap Release";
+    var motionChance = offense.style.motion + (def.man > 0.55 ? 0.22 : 0) +
+      (sit === "rz20" || sit === "rz10" ? 0.1 : 0);
+    if (pl.t !== "trick" && pl.n !== "QB Sneak" && rnd() < motionChance) {
+      motion = "Motion " + pick(per.labels, rnd) + " " + pick(L.MOTION_DIRS, rnd);
     }
-    var prot = "";
+
+    var adjust = "";
     if (pl.t === "shot" || pl.t === "pa") {
-      var deep = L.PROTECTIONS_DEEP.filter(function (x) {
-        return form.fam.indexOf("empty") === -1 || !/RB|7-man/.test(x);
-      });
-      prot = def.blitz >= 0.4 && form.fam.indexOf("empty") === -1
-        ? "Max Pro (7-man)"
-        : deep[Math.floor(rnd() * deep.length)];
-    } else if (pl.t === "quick" || pl.t === "mid") {
-      var isEmpty = form.fam.indexOf("empty") !== -1;
       if (def.blitz >= 0.4) {
-        prot = isEmpty ? "Empty 5-Man — Alert Hot" : "Half-Slide + RB Check";
+        adjust = per.rb && per.te ? "Max protect" : per.rb ? "HB block" : per.te ? "TE block" : pick(L.SLIDE, rnd);
       } else {
-        var quick = L.PROTECTIONS_QUICK.filter(function (x) {
-          return isEmpty ? true : x !== "Empty 5-Man";
-        });
-        prot = quick[Math.floor(rnd() * quick.length)];
+        var opts = L.SLIDE.slice();
+        if (per.rb) opts.push("HB block");
+        if (per.te) opts.push("TE block");
+        adjust = pick(opts, rnd);
       }
-    } else if (pl.t === "screen") {
-      prot = rnd() < 0.5 ? "Screen Rt" : "Screen Lt";
-    } else if (pl.t === "rpo") {
-      prot = "Run Read + Alert";
-    } else if (pl.t === "trick") {
-      prot = "Special — walk it through";
-    } else {
-      prot = rnd() < 0.5 ? "Zone Lt" : "Zone Rt";
-      if (/Power|Counter|Trap|Dart|Wham|GT/.test(pl.n)) prot = rnd() < 0.5 ? "Pull Rt" : "Pull Lt";
-      if (/Option|Midline|Read|Power Swing/.test(pl.n)) prot = "Option Rules";
-      if (pl.n === "QB Sneak") prot = "Wedge";
+    } else if (pl.t === "quick" || pl.t === "mid") {
+      if (def.blitz >= 0.4) {
+        var roll = rnd();
+        adjust = roll < 0.55 ? pick(L.SLIDE, rnd) : roll < 0.78 ? L.MIKE : pick(L.HOT_ROUTES, rnd);
+        if (adjust.indexOf("Hot route") === 0) {
+          /* only hot route a receiver the formation actually has */
+          var lbl = adjust.charAt(10);
+          if (per.labels.indexOf(lbl) === -1) adjust = pick(L.SLIDE, rnd);
+        } else if (adjust !== L.MIKE && per.rb && rnd() < 0.4) {
+          adjust += " + HB block";
+        }
+      }
+    } else if (pl.t === "run" || pl.t === "qb") {
+      if (pl.n !== "QB Sneak" && rnd() < 0.3) adjust = pick(L.RUN_ADJ, rnd);
     }
+
     var w = defWeights(def);
     var tags = topTags(pl, w).filter(function (t) { return (w[t] === undefined ? 0.2 : w[t]) >= 0.4; });
     var why;
@@ -255,7 +273,7 @@
       formation: form.name,
       personnel: form.personnel,
       motion: motion,
-      protection: prot,
+      protection: adjust,
       why: why,
       look: pl.look
     };

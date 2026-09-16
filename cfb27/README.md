@@ -51,8 +51,23 @@ For every slot on the sheet the engine scores candidate concepts by:
 - **variety** — no repeated concept, and formations rotate inside a section.
 
 Then it dresses the call with a formation from *your* playbook's pool (signature sets weighted
-first), a motion (more often against man), and a protection (max protect against heavy pressure,
-five-man in empty, slide away from a 3-tech).
+first) and the pre-snap adjustments that go with it.
+
+**Every call reads the same four lines:**
+
+| Line | Example | What it is |
+|---|---|---|
+| 1 | `PASS` **Y-Cross** | play type + the concept to call |
+| 2 | `Gun Bunch X Nasty` | formation to line up in |
+| 3 | `Motion Z left · Max protect` | **pre-snap adjustments to set in game** |
+| 4 | `zone beater` | why it is on the sheet against *their* playbook |
+| right | `11` | personnel grouping |
+
+Line 3 only ever contains things CFB 27 actually lets you set before the snap:
+`Motion X/Y/Z/H left|right`, `Flip play`, `Slide protect Lt/Rt`, `Half slide Lt/Rt`,
+`Max protect`, `HB block`, `TE block`, `ID the Mike`, and hot routes
+(`Hot route H → drag`, `Hot route Z → slant`, `Hot route X → block`). Pressure-heavy
+playbooks get protection help, man-heavy playbooks get more motion.
 
 Everything is seeded: the same matchup always produces the same sheet, and **↻ Re-roll** advances
 the seed for a fresh one.
