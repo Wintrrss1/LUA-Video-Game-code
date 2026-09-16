@@ -1,0 +1,17 @@
+{
+  "name": "CFB 27 Play Caller — Call Sheet Generator",
+  "short_name": "Play Caller",
+  "description": "Pick your College Football 27 offensive playbook and your opponent's defensive playbook and get an authentic down-and-distance call sheet plus a 15-play opening script.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#0b1410",
+  "theme_color": "#0b1410",
+  "categories": ["sports", "games", "utilities"],
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ]
+}

@@ -8,10 +8,14 @@ Beats are produced by the **[ElevenLabs Music](https://elevenlabs.io/music-api)*
 licensed, cleared for commercial use), so this needs an ElevenLabs account + API key and uses
 credits per beat.
 
-Two apps live here:
+Three apps live here:
 - **`index.html`** — RAGE AI, the AI beat generator (needs your API key).
 - **`studio.html`** — a free, offline, synthesized beat *maker* (a 16-step drum machine + one-tap
   pattern generator). Lower fidelity, but 100% free and no account.
+- **[`cfb27/`](./cfb27/)** — 🏈 **CFB 27 Play Caller**: pick your College Football 27 offensive
+  playbook and your opponent's defensive playbook, get an authentic down-and-distance call sheet
+  and a 15-play opening script. Free, offline, no account.
+  Live at **https://wintrrss1.github.io/LUA-Video-Game-code/cfb27/**
 
 ---
 
@@ -54,6 +58,7 @@ This repo auto-deploys via GitHub Actions. Your live URL is:
 | `PROXY_SETUP.md` | Step-by-step key + Worker setup |
 | `studio.html` | Free offline synthesized beat maker |
 | `manifest.webmanifest`, `sw.js`, `icon*` | PWA install + offline shell |
+| `cfb27/` | CFB 27 Play Caller — call sheet + opening script generator ([details](./cfb27/README.md)) |
 | `.github/workflows/pages.yml` | Auto-deploy to GitHub Pages |
 
 Turn it up. 🔊

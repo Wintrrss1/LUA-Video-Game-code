@@ -1,9 +1,10 @@
-name: Deploy RAGE to GitHub Pages
+name: Deploy site to GitHub Pages
 
 on:
   push:
     branches:
       - claude/rap-beat-generator-app-d143vh
+      - claude/cfb-playbook-pwa-app-5fvbla
       - main
   workflow_dispatch:
 

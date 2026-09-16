@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="theme-color" content="#0b1410" />
+<title>CFB 27 Play Caller — Call Sheet & Opening Script Generator</title>
+<meta name="description" content="Pick your College Football 27 offensive playbook and your opponent's defensive playbook and get an authentic down-and-distance call sheet plus a 15-play opening script." />
+
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="apple-mobile-web-app-title" content="Play Caller" />
+<link rel="manifest" href="manifest.webmanifest" />
+<link rel="apple-touch-icon" href="icon-180.png" />
+<link rel="icon" href="icon.svg" type="image/svg+xml" />
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <span class="mark">27</span>
+    <span class="title">CFB&nbsp;27 PLAY CALLER<small>call sheet &amp; opening script generator</small></span>
+  </div>
+  <button id="installBtn" class="ghost" hidden>Install</button>
+</header>
+
+<main>
+  <!-- ===== SETUP ===== -->
+  <section class="card" id="setup">
+    <h2 class="cardTitle">Set the matchup</h2>
+
+    <label class="fieldLabel" for="offFilter">Your offensive playbook</label>
+    <input id="offFilter" class="filter" type="search" placeholder="Search 149 offensive playbooks — team or scheme…" autocomplete="off" />
+    <select id="offSelect" class="picker" size="1"></select>
+    <p class="meta" id="offMeta"></p>
+
+    <label class="fieldLabel" for="defSelect">Opponent's defensive playbook</label>
+    <select id="defSelect" class="picker"></select>
+    <p class="meta" id="defMeta"></p>
+
+    <div class="row">
+      <button id="genBtn" class="primary">Generate game plan</button>
+      <button id="rerollBtn" class="ghost" title="Same matchup, fresh sheet">↻ Re-roll</button>
+    </div>
+    <div class="row wrap" id="recents"></div>
+  </section>
+
+  <!-- ===== OUTPUT ===== -->
+  <section id="out" hidden>
+    <nav class="tabs" role="tablist">
+      <button class="tab on" data-view="plan" role="tab">Game plan</button>
+      <button class="tab" data-view="script" role="tab">Opening 15</button>
+      <button class="tab" data-view="sheet" role="tab">Call sheet</button>
+    </nav>
+
+    <div class="sheetHead">
+      <div>
+        <h1 id="matchTitle"></h1>
+        <p id="matchSub" class="meta"></p>
+      </div>
+      <div class="actions">
+        <button id="printBtn" class="ghost">🖨 Print / PDF</button>
+        <button id="copyBtn" class="ghost">⧉ Copy</button>
+        <button id="dlBtn" class="ghost">⬇ .txt</button>
+      </div>
+    </div>
+
+    <div id="view-plan" class="view"></div>
+    <div id="view-script" class="view" hidden></div>
+    <div id="view-sheet" class="view" hidden></div>
+  </section>
+
+  <section class="card note">
+    <h2 class="cardTitle">How this works</h2>
+    <p>Every call is generated from the matchup, not from a fixed list. The generator reads your playbook's
+      style (formation pool, tempo, run/pass identity) against the opponent playbook's DNA — box count,
+      coverage shell, man/zone split, pressure rate, press tendency — and picks the concept whose strengths
+      attack what that defense gives up, then dresses it with a formation from your book, a motion and a
+      protection.</p>
+    <p class="meta">All 138 CFB 27 team offensive playbooks, all 11 scheme playbooks (Air Raid, Go Go,
+      Multiple, Option, Pistol, Power Spread, Pro Style, Run &amp; Shoot, Spread, Spread Option,
+      Veer &amp; Shoot) and all 31 defensive playbooks are included. Each team's style tag reflects that
+      program's real offensive identity — swap to a scheme playbook any time you disagree with a tag.
+      Works offline once loaded, so add it to your home screen and run it on the couch.</p>
+  </section>
+</main>
+
+<footer class="foot">Down &amp; distance sheet · opening script · red zone · two-minute · shots · screens</footer>
+
+<script src="data.js"></script>
+<script src="plays.js"></script>
+<script src="engine.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
