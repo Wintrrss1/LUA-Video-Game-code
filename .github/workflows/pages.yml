@@ -2,9 +2,12 @@ name: Deploy site to GitHub Pages
 
 on:
   push:
+    # Only the branch the github-pages environment allows to deploy. Adding a
+    # dev branch here starts a run that the environment rejects in ~2s, and
+    # because of the shared `pages` concurrency group with cancel-in-progress
+    # that rejected run cancels the real deploy.
     branches:
       - claude/rap-beat-generator-app-d143vh
-      - claude/cfb-playbook-pwa-app-5fvbla
       - main
   workflow_dispatch:
 
