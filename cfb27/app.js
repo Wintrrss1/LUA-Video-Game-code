@@ -28,7 +28,9 @@
       list.forEach(function (o) {
         var op = document.createElement("option");
         op.value = o.id;
-        op.textContent = o.kind === "team" ? o.name + " — " + o.style : o.name;
+        var imported = !!(window.CFB27_BOOKS && window.CFB27_BOOKS[o.id]);
+        op.textContent = (o.kind === "team" ? o.name + " — " + o.style : o.name) +
+          (imported ? "  ★ imported" : "");
         g.appendChild(op);
         shown++;
       });
@@ -65,8 +67,17 @@
     var o = D.OFFENSES.filter(function (x) { return x.id === offSelect.value; })[0];
     if (!o) { $("offMeta").textContent = ""; return; }
     var st = D.OFF_STYLES[o.style];
-    $("offMeta").textContent = (o.kind === "team" ? o.conference + " · " : "") + o.style +
-      " · " + Math.round(st.pass * 100) + "% pass on neutral downs · tempo " + st.tempo + "/5 — " + st.blurb;
+    var book = window.CFB27_BOOKS && window.CFB27_BOOKS[o.id];
+    var el = $("offMeta");
+    if (book) {
+      var np = book.formations.reduce(function (n, f) { return n + f.plays.length; }, 0);
+      el.innerHTML = "<b style='color:var(--accent)'>★ Imported playbook</b> — " +
+        book.formations.length + " formations, " + np + " plays, straight from the book. " +
+        "Every call on the sheet is a play you can actually select.";
+    } else {
+      el.textContent = (o.kind === "team" ? o.conference + " · " : "") + o.style +
+        " · " + Math.round(st.pass * 100) + "% pass on neutral downs · tempo " + st.tempo + "/5 — " + st.blurb;
+    }
   }
 
   function describeDef() {
@@ -118,8 +129,14 @@
       '<div style="padding:11px"><ul class="bullets warn">' +
       r.expect.map(function (a) { return "<li>" + esc(a) + "</li>"; }).join("") + "</ul></div></div>";
 
+    var pkgNote = o.imported
+      ? "The real formation list from your playbook — " + o.formations.length + " formations, " +
+        o.playCount + " plays. Every call above comes out of these."
+      : "Approximated from the " + esc(o.style) + " style" +
+        (o.signature.length ? ", with this playbook's known signature sets first" : "") +
+        " — these are real CFB 27 formations, but the list is inferred, so your book may not carry all of them.";
     html += '<div class="block"><div class="blockHead"><h3>Your formation package</h3>' +
-      "<p>" + (o.signature.length ? "Signature sets first — those are the ones this playbook is built around." : "Drawn from the " + esc(o.style) + " formation pool.") + "</p></div>" +
+      "<p>" + pkgNote + "</p></div>" +
       '<div style="padding:11px"><div class="tagList">' +
       o.formations.map(function (f) {
         var sig = o.signature.indexOf(f) !== -1;

@@ -21,7 +21,8 @@ the first load.
 
 | | Count |
 |---|---|
-| Team offensive playbooks | **138** (every CFB 27 team) |
+| **Imported playbooks** (real formations + real plays) | **1** — Ohio State (33 formations, 465 plays) |
+| Team offensive playbooks (approximated) | **138** (every CFB 27 team) |
 | Scheme offensive playbooks | **11** — Air Raid, Go Go, Multiple, Option, Pistol, Power Spread, Pro Style, Run & Shoot, Spread, Spread Option, Veer & Shoot |
 | Defensive playbooks | **31** — the 3-2-6, 3-3-5, 3-4, 4-2-5, 4-3 and Multiple families with every Man / Zone / Pressure / Shell / Tite / Three High / Press Quarters variant |
 | Formations in the catalog | **44**, every one a real CFB 27 formation (Gun, Pistol, Singleback, I Form, Flexbone, Full House, Wildcat, Goal Line) |
@@ -34,6 +35,35 @@ Red Zone 20-11 · Red Zone 10-4 · Goal Line · Backed Up · Two-Minute · Four-
 Shots · Screens · Trick / Specials · Two-Point.
 
 ---
+
+## Imported playbooks vs. approximated ones
+
+There are two grades of playbook in this app, and the difference matters:
+
+**Imported** (marked ★ in the picker). The playbook's real formation list and real play list,
+supplied from the game. Every call on the sheet is a play you can actually select, in the formation
+it actually lives in. Nothing is inferred except personnel groupings. Currently: **Ohio State**
+(33 formations, 465 plays).
+
+**Approximated** (everything else). Real CFB 27 formation *names*, but which formations a given
+playbook carries is inferred from its style, so the sheet can name a set your book does not have.
+Useful for scouting an opponent's tendencies; not exact for calling your own game.
+
+To import a playbook, send its formation list with the plays under each formation. The importer
+([`classify.js`](./classify.js)) reads real CFB 27 play names and derives what the engine needs:
+
+| From the name | Derived |
+|---|---|
+| `INSIDE ZONE SPLIT` | run, zone scheme, beats light box / two-high / sub personnel |
+| `MTN RPO ZONE PEEK` | RPO, motion already built into the call, beats single-high and man |
+| `PA BOOT SLIDE` | play action, beats single-high / heavy box / man, plus zone and blitz off the boot |
+| `HB SLIP SCREEN` | screen, beats blitz and a loaded box |
+| `Z SPOT GOALLINE` | quick pass, goal-line and two-point situations |
+| `MESH SPOT` | intermediate, beats man and zone both |
+
+Prefixes carry real information and are used: `MTN` / `DBL MTN` / `JET` / `SHUFFLE` / `CHEAT` /
+`SFT` / `RETURN` mean the motion is in the play call, so the sheet does not tell you to motion
+by hand. Anything the importer cannot place confidently is reported rather than guessed.
 
 ## How the generator works
 
@@ -50,8 +80,10 @@ For every slot on the sheet the engine scores candidate concepts by:
 - **formation legality** — you cannot hand off, run an RPO or fake a run out of an empty set,
 - **variety** — no repeated concept, and formations rotate inside a section.
 
-Then it dresses the call with a formation from *your* playbook's pool (signature sets weighted
-first) and the pre-snap adjustments that go with it.
+For an imported playbook the candidate pool *is* the book, and each play already knows its
+formation, so formation selection disappears entirely — there is nothing left to get wrong.
+For an approximated playbook it dresses the concept with a formation from the style pool
+(signature sets weighted first). Either way the pre-snap adjustments are added the same way.
 
 **Every call reads the same four lines:**
 

@@ -1,7 +1,7 @@
 /* CFB 27 Play Caller — offline shell */
-const CACHE = "cfb27-playcaller-v3";
+const CACHE = "cfb27-playcaller-v4";
 const ASSETS = [
-  "./", "./index.html", "./styles.css", "./data.js", "./plays.js", "./engine.js", "./app.js",
+  "./", "./index.html", "./styles.css", "./data.js", "./plays.js", "./classify.js", "./books/ohio-state.js", "./engine.js", "./app.js",
   "./manifest.webmanifest", "./icon.svg", "./icon-180.png", "./icon-192.png", "./icon-512.png"
 ];
 

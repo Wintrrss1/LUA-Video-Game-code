@@ -10,6 +10,8 @@
 
   var D = global.CFB27_DATA;
   var L = global.CFB27_PLAYS;
+  var CL = global.CFB27_CLASSIFY;
+  function books() { return global.CFB27_BOOKS || {}; }
 
   /* ---------- seeded RNG (mulberry32) ---------- */
   function hashStr(s) {
@@ -87,6 +89,8 @@
      known signature sets — not a scrape of the real book. `override` is the
      user's own formation list for this playbook, and when present it wins. */
   function defaultFormations(off) {
+    var book = books()[off.id];
+    if (book) return book.formations.map(function (f) { return f.name; });
     var style = D.OFF_STYLES[off.style];
     var names = [];
     off.signature.concat(style.pool, UNIVERSAL_FORMS).forEach(function (f) {
@@ -95,7 +99,41 @@
     return names;
   }
 
+  /* An imported playbook: real formations, real plays. Each play carries the
+     formation it actually lives in, so nothing is ever placed in a set the
+     book does not have. */
+  function buildFromBook(off, book, override) {
+    var forms = book.formations.filter(function (f) {
+      return !(override && override.length) || override.indexOf(f.name) !== -1;
+    });
+    if (!forms.length) forms = book.formations;
+    var formations = forms.map(function (f) {
+      return { name: f.name, personnel: f.personnel, fam: f.fam, signature: false };
+    });
+    var plays = [];
+    forms.forEach(function (f, i) {
+      var ctx = { goalLine: f.family === "Goal Line", hailMary: f.family === "Hail Mary" };
+      f.plays.forEach(function (name) {
+        var c = CL.classify(name, ctx);
+        plays.push({
+          n: name, t: c.t || c.type, fam: f.fam, b: c.beats, s: c.sits, st: "*",
+          look: "", form: formations[i], motionBuiltIn: c.motion, lowConfidence: c.confidence === "low"
+        });
+      });
+    });
+    return {
+      pb: off,
+      style: D.OFF_STYLES[off.style],
+      styleName: off.style,
+      formations: formations,
+      bookPlays: plays,
+      book: book
+    };
+  }
+
   function buildOffense(off, override) {
+    var book = books()[off.id];
+    if (book && CL) return buildFromBook(off, book, override);
     var style = D.OFF_STYLES[off.style];
     var names = [];
     var source = (override && override.length) ? override : defaultFormations(off);
@@ -191,6 +229,7 @@
 
   /* you cannot hand the ball off, run an RPO or fake a run out of an empty set */
   function formationLegal(pl, f) {
+    if (pl.form) return pl.form === f;
     if (f.fam.indexOf("empty") === -1) return true;
     if (pl.t === "run" || pl.t === "rpo" || pl.t === "pa") return false;
     if (pl.t === "qb") return /Draw/.test(pl.n);
@@ -199,6 +238,7 @@
   }
 
   function pickFormation(pl, offense, sit, rnd, usedForms) {
+    if (pl.form) return pl.form;
     var cands = offense.formations.filter(function (f) {
       return formationLegal(pl, f) && f.fam.some(function (x) { return pl.fam.indexOf(x) !== -1; });
     });
@@ -242,7 +282,9 @@
     var motion = "";
     var motionChance = offense.style.motion + (def.man > 0.55 ? 0.22 : 0) +
       (sit === "rz20" || sit === "rz10" ? 0.1 : 0);
-    if (pl.t !== "trick" && pl.n !== "QB Sneak" && rnd() < motionChance) {
+    if (pl.motionBuiltIn) {
+      motion = "motion built in";
+    } else if (pl.t !== "trick" && !/SNEAK/i.test(pl.n) && rnd() < motionChance) {
       motion = "Motion " + pick(per.labels, rnd) + " " + pick(L.MOTION_DIRS, rnd);
     }
 
@@ -312,6 +354,7 @@
           if (pl.st !== "*" && pl.st.indexOf(offense.styleName) === -1) return false;
           if (used[pl.n] && tier.strict && !REPEAT_OK[sec.k]) return false;
           if (calls.some(function (c) { return c.play === pl.n; })) return false;
+          if (pl.form) return true;
           return offense.formations.some(function (f) {
             return formationLegal(pl, f) && f.fam.some(function (x) { return pl.fam.indexOf(x) !== -1; });
           });
@@ -372,6 +415,7 @@
           if (al.indexOf(pl.t) === -1) return false;
           if (pl.st !== "*" && pl.st.indexOf(offense.styleName) === -1) return false;
           if (used[pl.n]) return false;
+          if (pl.form) return true;
           return offense.formations.some(function (f) {
             return formationLegal(pl, f) && f.fam.some(function (x) { return pl.fam.indexOf(x) !== -1; });
           });
@@ -442,7 +486,7 @@
     var offense = buildOffense(off, override);
     var w = defWeights(def);
     var rnd = rngFrom(off.id + "|" + def.id + "|" + (seedNum || 0) + "|" + offense.formations.map(function (f) { return f.name; }).join(","));
-    var plays = L.PLAYS;
+    var plays = offense.bookPlays || L.PLAYS;
     var used = {};
     var script = buildScript(offense, def, w, rnd, used, plays);
     var sections = SECTIONS.map(function (sec) {
@@ -455,7 +499,10 @@
         blurb: offense.style.blurb, tempo: offense.style.tempo, passRate: passRate,
         formations: offense.formations.map(function (f) { return f.name; }),
         signature: off.signature,
-        custom: !!(override && override.length)
+        custom: !!(override && override.length),
+        imported: !!offense.book,
+        source: offense.book ? offense.book.source : "",
+        playCount: offense.bookPlays ? offense.bookPlays.length : 0
       },
       defense: {
         name: def.name, front: def.front, flavor: def.flavor, box: def.box, dbs: def.dbs,
