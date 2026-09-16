@@ -24,7 +24,7 @@ the first load.
 | Team offensive playbooks | **138** (every CFB 27 team) |
 | Scheme offensive playbooks | **11** — Air Raid, Go Go, Multiple, Option, Pistol, Power Spread, Pro Style, Run & Shoot, Spread, Spread Option, Veer & Shoot |
 | Defensive playbooks | **31** — the 3-2-6, 3-3-5, 3-4, 4-2-5, 4-3 and Multiple families with every Man / Zone / Pressure / Shell / Tite / Three High / Press Quarters variant |
-| Formations in the catalog | 51 (shotgun, pistol, singleback, under center, flexbone, heavy, goal line) |
+| Formations in the catalog | **44**, every one a real CFB 27 formation (Gun, Pistol, Singleback, I Form, Flexbone, Full House, Wildcat, Goal Line) |
 | Play concepts | 108, each tagged with what it beats |
 | Matchups | 149 × 31 = **4,619**, each generating a complete sheet |
 
@@ -59,23 +59,47 @@ the seed for a fresh one.
 
 ---
 
-## Data sourcing (read this before you argue with a tag)
+## Data sourcing — no Madden content
 
-CFB 27's structure is taken from public playbook databases and the game itself:
+Every formation in the catalog is a formation that exists in **CFB 27**, checked name-by-name
+against the game's public formation database. Madden-only sets are deliberately excluded —
+if you have seen these in a call-sheet tool before, they are Madden's, not CFB 27's:
 
-- **138 playable teams**; offensive playbooks are named after **schools**, while the **31
-  defensive playbooks are named by scheme** and every school is assigned one of them.
-- The **11 offensive playbook styles** listed above are the styles CFB 27 ships.
+> ~~Swinging Gate~~, ~~Gun Empty Trey~~, ~~Gun Doubles Off~~, ~~Gun Mid Close~~, ~~Gun Y-Off Nasty~~,
+> ~~Singleback Ace Pair~~, ~~Jumbo Heavy~~, ~~Wishbone~~, ~~Split Backs~~, ~~Full House Wide~~,
+> ~~Strong Close~~, ~~Weak Pro~~, ~~Pistol Diamond~~
 
-What is **derived, not scraped**: each team's style tag and signature formations. Those reflect
-the program's real offensive identity (and, for the widely-documented meta playbooks —
-Washington State's Gun Bunch X Nasty, West Virginia's Gun Power I Tight, Fresno State's Tight
-Doubles, Colorado's Go Go, Ohio State / Oregon / USC / Texas / LSU — the formations creators
-actually call). If a tag does not match what you see in your copy of the game, it is one line in
+CFB 27 names them differently, and those are the names used here: `Gun Empty Base`,
+`Gun Empty Quads`, `Gun Empty Y Flex`, `Gun Empty Bunch Open`, `Gun Empty Y Off Trips`,
+`Gun Doubles Y Off`, `Gun Deuce`, `Gun Bunch X Nasty`, `Gun Bunch Str Nasty`, `Gun Y Trips Wk`,
+`Gun Y Off Trips`, `Gun Spread Y Slot`, `Gun Slot Left Wk`, `Gun Power I Tight`,
+`Gun Wide Full House`, `Gun Flexbone Heavy`, `Pistol Ace Slot`, `Pistol Tight Y Off Flex`,
+`Singleback Bunch Ace`, `Singleback Wing Pair`, `I Form Pro`, `I Form Tight`, `Flexbone Normal`,
+`Flexbone Slot`, `Flexbone Trips`, `Flexbone Close`, `Flexbone Tight`, `Flexbone Heavy`,
+`Full House Pro`, `Wildcat U Off Trips`, `Goal Line Normal` and the rest.
+
+Also verified from the database, and baked in as team signature sets: Washington State's
+**Gun Bunch X Nasty** (Air Raid), West Virginia's **Gun Power I Tight**, Tennessee's
+**Gun Wide Full House**, Georgia / Arkansas / FAU's **Gun Empty Y Flex**, Florida / Georgia Tech /
+Ball State's **Gun Empty Y Off Trips**, Cal / Illinois / Louisiana Tech's **Gun Empty Quads**,
+Iowa State / Oklahoma / South Carolina's **Gun Empty Bunch Open**, Houston / Louisiana /
+Wisconsin's **Gun Spread Y Slot**, Wyoming's **Gun Y Trips Wk**, Air Force's **Flexbone Close /
+Tight / Trips + Full House Pro**, Army and Navy's **Flexbone Slot**, and Pistol Ace for Baylor,
+Coastal Carolina, Eastern Michigan and San Diego State.
+
+Play names follow the same rule. Where CFB 27's own label is known it is used — **Mesh**,
+**Mesh Spot**, **Dagger**, **Stick**, **Stick Wheel**, **Post Wheel**, **Y Corner**, **All Go**,
+**Strong Toss**, **Direct Snap**, **QB Power Swing**. The rest are plain coaching names for the
+concept (Inside Zone, Counter Trey, Shallow Cross, Skinny Post, Post Dig), never Madden play art:
+*Philly Special*, *Jailbreak Screen* and *Hoss Y Juke* are gone.
+
+What is still **derived, not verified**: each team's playbook *style* tag (Air Raid / Spread /
+Pro Style / …) where the database did not state it. Those reflect the program's real offensive
+identity. If one does not match your copy of the game, it is a single line in
 [`data.js`](./data.js) — or just pick the matching **scheme playbook** instead.
 
-The concept library is football, not a play-name dump from the game's UI, so a few names are the
-coaching name rather than EA's exact label (e.g. *Mesh Deep Over*, *Post-Dig (Mills)*, *Bang 8*).
+Found something that is not in your game? That is a data fix, not a code fix: delete the row in
+`FORMATION_ROWS` or the concept in `plays.js` and everything else keeps working.
 
 ---
 

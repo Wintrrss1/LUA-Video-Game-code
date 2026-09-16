@@ -70,7 +70,7 @@
     if (pl.t === "qb") return "qb";
     if (pl.t === "shot") return "verts";
     if (pl.t === "trick") return "shot";
-    if (/Option|Veer|Midline|Rocket|Zone Read|Bash/.test(n)) return "option";
+    if (/Option|Midline|Rocket|Zone Read|Power Read|Power Swing/.test(n)) return "option";
     if (pl.t === "run") return /Zone|Stretch|Duo|Dive/.test(n) ? "zone" : "gap";
     if (/Mesh|Cross|Drive|Follow|Trail/.test(n)) return "mesh";
     if (/Choice|Iso/.test(n)) return "choice";
@@ -80,7 +80,8 @@
   }
 
   /* ---------- offense build-out ---------- */
-  var UNIVERSAL_FORMS = ["Goal Line", "Jumbo Heavy", "Swinging Gate"];
+  /* every CFB 27 playbook carries the short-yardage package */
+  var UNIVERSAL_FORMS = ["Goal Line Normal"];
 
   function buildOffense(off) {
     var style = D.OFF_STYLES[off.style];
@@ -179,7 +180,7 @@
     if (f.fam.indexOf("empty") === -1) return true;
     if (pl.t === "run" || pl.t === "rpo" || pl.t === "pa") return false;
     if (pl.t === "qb") return /Draw/.test(pl.n);
-    if (pl.t === "trick") return /Pass|Gate/.test(pl.n);
+    if (pl.t === "trick") return /Pass|Screen/.test(pl.n);
     return true;
   }
 
@@ -236,7 +237,7 @@
     } else {
       prot = rnd() < 0.5 ? "Zone Lt" : "Zone Rt";
       if (/Power|Counter|Trap|Dart|Wham|GT/.test(pl.n)) prot = rnd() < 0.5 ? "Pull Rt" : "Pull Lt";
-      if (/Option|Veer|Midline|Read/.test(pl.n)) prot = "Option Rules";
+      if (/Option|Midline|Read|Power Swing/.test(pl.n)) prot = "Option Rules";
       if (pl.n === "QB Sneak") prot = "Wedge";
     }
     var w = defWeights(def);
