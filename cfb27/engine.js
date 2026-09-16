@@ -83,12 +83,26 @@
   /* every CFB 27 playbook carries the short-yardage package */
   var UNIVERSAL_FORMS = ["Goal Line Normal"];
 
-  function buildOffense(off) {
+  /* The default list is a starting point built from the playbook's style and its
+     known signature sets — not a scrape of the real book. `override` is the
+     user's own formation list for this playbook, and when present it wins. */
+  function defaultFormations(off) {
     var style = D.OFF_STYLES[off.style];
     var names = [];
     off.signature.concat(style.pool, UNIVERSAL_FORMS).forEach(function (f) {
       if (D.FORMATIONS[f] && names.indexOf(f) === -1) names.push(f);
     });
+    return names;
+  }
+
+  function buildOffense(off, override) {
+    var style = D.OFF_STYLES[off.style];
+    var names = [];
+    var source = (override && override.length) ? override : defaultFormations(off);
+    source.forEach(function (f) {
+      if (D.FORMATIONS[f] && names.indexOf(f) === -1) names.push(f);
+    });
+    if (!names.length) names = defaultFormations(off);
     var sigSet = {};
     off.signature.forEach(function (f) { sigSet[f] = true; });
     return {
@@ -421,13 +435,13 @@
   }
 
   /* ---------- public API ---------- */
-  function generate(offId, defId, seedNum) {
+  function generate(offId, defId, seedNum, override) {
     var off = D.OFFENSES.filter(function (o) { return o.id === offId; })[0];
     var def = D.DEFENSES.filter(function (d) { return d.id === defId; })[0];
     if (!off || !def) return null;
-    var offense = buildOffense(off);
+    var offense = buildOffense(off, override);
     var w = defWeights(def);
-    var rnd = rngFrom(off.id + "|" + def.id + "|" + (seedNum || 0));
+    var rnd = rngFrom(off.id + "|" + def.id + "|" + (seedNum || 0) + "|" + offense.formations.map(function (f) { return f.name; }).join(","));
     var plays = L.PLAYS;
     var used = {};
     var script = buildScript(offense, def, w, rnd, used, plays);
@@ -440,7 +454,8 @@
         name: off.name, kind: off.kind, conference: off.conference, style: off.style,
         blurb: offense.style.blurb, tempo: offense.style.tempo, passRate: passRate,
         formations: offense.formations.map(function (f) { return f.name; }),
-        signature: off.signature
+        signature: off.signature,
+        custom: !!(override && override.length)
       },
       defense: {
         name: def.name, front: def.front, flavor: def.flavor, box: def.box, dbs: def.dbs,
@@ -456,5 +471,5 @@
     };
   }
 
-  global.CFB27_ENGINE = { generate: generate, SECTIONS: SECTIONS };
+  global.CFB27_ENGINE = { generate: generate, SECTIONS: SECTIONS, defaultFormations: defaultFormations };
 })(typeof window !== "undefined" ? window : globalThis);
