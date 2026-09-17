@@ -170,6 +170,57 @@
     $("view-sheet").innerHTML = '<div class="sheetGrid">' + html + "</div>";
   }
 
+  var pinnedForm = null;
+
+  function slug(s) { return s.replace(/[^a-z0-9]+/gi, "-").toLowerCase(); }
+
+  function renderForms(r) {
+    var blocks = r.byFormation.filter(function (f) { return f.covered > 0; });
+    if (pinnedForm && !blocks.some(function (f) { return f.name === pinnedForm; })) pinnedForm = null;
+
+    var jump = blocks.map(function (f) {
+      return '<button class="fchip' + (pinnedForm === f.name ? " on" : "") + '" data-form="' +
+        esc(f.name) + '">' + esc(f.name) + "</button>";
+    }).join("");
+    if (pinnedForm) {
+      jump = '<button class="fchip clear" data-form="">&times; show all</button>' + jump;
+    }
+
+    var shown = pinnedForm ? blocks.filter(function (f) { return f.name === pinnedForm; }) : blocks;
+    var cards = shown.map(function (f) {
+      var rows = f.rows.map(function (w) {
+        if (!w.call) {
+          return '<tr><td class="sit">' + esc(w.label) + '</td><td class="none">— nothing in this formation</td></tr>';
+        }
+        var c = w.call;
+        var dress = [];
+        if (c.motion) dress.push(c.motion);
+        if (c.protection) dress.push(c.protection);
+        return "<tr>" + '<td class="sit">' + esc(w.label) + "</td>" +
+          '<td class="fcall"><b>' + pill(c.type) + " " + esc(c.play) + "</b>" +
+          (dress.length ? '<div class="dress">' + esc(dress.join(" · ")) + "</div>" : "") +
+          (c.why ? '<div class="why">' + esc(c.why) + "</div>" : "") + "</td></tr>";
+      }).join("");
+      return '<div class="block fcard' + (pinnedForm === f.name ? " pinned" : "") + '" id="fc-' + slug(f.name) + '">' +
+        '<div class="blockHead"><h3>' + esc(f.name) + "</h3>" +
+        '<p>' + esc(f.personnel) + ' personnel · <span class="cov">' + f.covered + " of " + f.rows.length +
+        " downs covered</span></p></div><table>" + rows + "</table></div>";
+    }).join("");
+
+    $("view-forms").innerHTML = '<div class="formJump" id="formJump">' + jump + "</div>" +
+      '<div class="sheetGrid">' + cards + "</div>";
+
+    Array.prototype.forEach.call($("view-forms").querySelectorAll(".fchip"), function (b) {
+      b.addEventListener("click", function () {
+        var name = b.dataset.form;
+        pinnedForm = (!name || name === pinnedForm) ? null : name;
+        renderForms(r);
+        var target = pinnedForm ? $("fc-" + slug(pinnedForm)) : $("view-forms");
+        if (target) target.scrollIntoView({ block: "start" });
+      });
+    });
+  }
+
   /* ---------- plain-text export ---------- */
   function asText(r) {
     var L = [];
@@ -203,6 +254,18 @@
         L.push("   " + (i + 1) + ") " + c.formation + " [" + c.personnel + "]" +
           (c.motion ? " " + c.motion : "") + " — " + c.play +
           (c.protection ? " · " + c.protection : "") + (c.why ? " · " + c.why : ""));
+      });
+    });
+    line();
+    L.push("BY FORMATION — every down out of one formation");
+    r.byFormation.filter(function (f) { return f.covered > 0; }).forEach(function (f) {
+      L.push("");
+      L.push("-- " + f.name.toUpperCase() + " [" + f.personnel + "] --");
+      f.rows.forEach(function (w) {
+        if (!w.call) return;
+        L.push("   " + (w.label + ":").padEnd(14) + w.call.play +
+          (w.call.motion ? " · " + w.call.motion : "") +
+          (w.call.protection ? " · " + w.call.protection : ""));
       });
     });
     L.push("");
@@ -260,7 +323,8 @@
     $("matchSub").textContent = r.offense.style + " playbook against a " + r.defense.front +
       " front (" + r.defense.flavor + ") · " + r.defense.box + "-man box · " + r.defense.shell +
       " shell · sheet #" + (r.seed + 1);
-    renderPlan(r); renderScript(r); renderSheet(r);
+    renderPlan(r); renderScript(r); renderSheet(r); renderForms(r);
+    showTab(lastTab());
     saveRecent(offSelect.value, defSelect.value);
     $("out").scrollIntoView({ behavior: "smooth", block: "start" });
   }
@@ -289,14 +353,20 @@
     generate();
   });
 
-  Array.prototype.forEach.call(document.querySelectorAll(".tab"), function (t) {
-    t.addEventListener("click", function () {
-      Array.prototype.forEach.call(document.querySelectorAll(".tab"), function (x) { x.classList.remove("on"); });
-      t.classList.add("on");
-      ["plan", "script", "sheet"].forEach(function (v) {
-        $("view-" + v).hidden = v !== t.dataset.view;
-      });
+  var VIEWS = ["plan", "script", "sheet", "forms"];
+  function lastTab() {
+    try { return localStorage.getItem("cfb27.tab") || "forms"; } catch (e) { return "forms"; }
+  }
+  function showTab(view) {
+    if (VIEWS.indexOf(view) === -1) view = "forms";
+    Array.prototype.forEach.call(document.querySelectorAll(".tab"), function (x) {
+      x.classList.toggle("on", x.dataset.view === view);
     });
+    VIEWS.forEach(function (v) { $("view-" + v).hidden = v !== view; });
+    try { localStorage.setItem("cfb27.tab", view); } catch (e) {}
+  }
+  Array.prototype.forEach.call(document.querySelectorAll(".tab"), function (t) {
+    t.addEventListener("click", function () { showTab(t.dataset.view); });
   });
 
   $("printBtn").addEventListener("click", function () { window.print(); });

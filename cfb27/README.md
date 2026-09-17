@@ -29,6 +29,19 @@ the first load.
 | Play concepts | 108, each tagged with what it beats |
 | Matchups | 149 × 31 = **4,619**, each generating a complete sheet |
 
+### Two ways to read it
+
+**By formation** (the default tab). One card per formation, and inside it the best call out of *that
+formation* for every down and distance — 1st & 10 (a run and a pass), 2nd & short / medium / long,
+3rd & short / medium / long, red zone, goal line, shot, screen, two-minute. Tap a formation to pin
+it and everything else disappears, so between snaps you stay lined up in the same set and read
+straight down instead of hunting across the sheet. Formations are ordered by how well they attack
+the opponent's playbook, and a row reads "nothing in this formation" rather than inventing a play
+the formation does not have.
+
+**Down & distance** (the classic sheet). Organised by situation instead, 18 blocks, for scripting
+and pre-game.
+
 ### Call sheet sections
 1st & 10 · 2nd & Short / Medium / Long · 3rd & Short / Medium / Long · 4th Down ·
 Red Zone 20-11 · Red Zone 10-4 · Goal Line · Backed Up · Two-Minute · Four-Minute ·

@@ -50,9 +50,10 @@
   <!-- ===== OUTPUT ===== -->
   <section id="out" hidden>
     <nav class="tabs" role="tablist">
-      <button class="tab on" data-view="plan" role="tab">Game plan</button>
+      <button class="tab" data-view="forms" role="tab">By formation</button>
+      <button class="tab" data-view="sheet" role="tab">Down &amp; dist</button>
       <button class="tab" data-view="script" role="tab">Opening 15</button>
-      <button class="tab" data-view="sheet" role="tab">Call sheet</button>
+      <button class="tab on" data-view="plan" role="tab">Plan</button>
     </nav>
 
     <div class="sheetHead">
@@ -61,7 +62,9 @@
         <p id="matchSub" class="meta"></p>
         <p class="legend"><b>How to read a call:</b> play &middot; formation to line up in &middot;
           <em>pre-snap adjustments to set in game</em> &middot; why it beats their playbook &mdash;
-          personnel grouping on the right.</p>
+          personnel grouping on the right. <b>By formation</b> gives you every down out of one
+          formation, so you can stay lined up and call the next play without hunting &mdash; tap a
+          formation to pin it.</p>
       </div>
       <div class="actions">
         <button id="printBtn" class="ghost">🖨 Print / PDF</button>
@@ -70,6 +73,7 @@
       </div>
     </div>
 
+    <div id="view-forms" class="view" hidden></div>
     <div id="view-plan" class="view"></div>
     <div id="view-script" class="view" hidden></div>
     <div id="view-sheet" class="view" hidden></div>

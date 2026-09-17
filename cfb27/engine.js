@@ -441,6 +441,70 @@
     });
   }
 
+  /* ---------- formation-first sheet ----------
+     For every formation, the best call out of THAT formation for each
+     down-and-distance, so you line up once and read down the column
+     instead of hunting across the sheet between snaps. */
+  var FORM_ROWS = [
+    { k: "1st10", label: "1st & 10", want: "run" },
+    { k: "1st10", label: "1st & 10", want: "pass" },
+    { k: "2sh", label: "2nd & short" },
+    { k: "2md", label: "2nd & med" },
+    { k: "2lg", label: "2nd & long" },
+    { k: "3sh", label: "3rd & short" },
+    { k: "3md", label: "3rd & med" },
+    { k: "3lg", label: "3rd & long" },
+    { k: "rz20", label: "Red zone" },
+    { k: "gl", label: "Goal line" },
+    { k: "shot", label: "Shot" },
+    { k: "screen", label: "Screen" },
+    { k: "2min", label: "Two-minute" }
+  ];
+  var RUN_TYPES = ["run", "qb", "rpo"];
+
+  function buildByFormation(offense, def, w, rnd, plays) {
+    return offense.formations.map(function (form) {
+      /* plays available from this formation only */
+      var own = plays.filter(function (pl) {
+        if (pl.form) return pl.form === form;
+        return formationLegal(pl, form) && form.fam.some(function (x) { return pl.fam.indexOf(x) !== -1; });
+      });
+      var usedHere = {};
+      var rows = [];
+      var fit = 0, covered = 0;
+      FORM_ROWS.forEach(function (spec) {
+        var pool = own.filter(function (pl) {
+          if (pl.s.indexOf(spec.k) === -1) return false;
+          if (usedHere[pl.n]) return false;
+          if (spec.want === "run" && RUN_TYPES.indexOf(pl.t) === -1) return false;
+          if (spec.want === "pass" && RUN_TYPES.indexOf(pl.t) !== -1) return false;
+          return true;
+        });
+        if (!pool.length) {
+          rows.push({ label: spec.label, call: null });
+          return;
+        }
+        var best = pool.map(function (pl) {
+          return { pl: pl, s: scorePlay(pl, w, offense, rnd) };
+        }).sort(function (a, b) { return b.s - a.s; })[0];
+        usedHere[best.pl.n] = true;
+        fit += best.s;
+        covered++;
+        rows.push({ label: spec.label, call: dressCall(best.pl, form, def, offense, rnd, spec.k) });
+      });
+      return {
+        name: form.name,
+        personnel: form.personnel,
+        covered: covered,
+        fit: covered ? fit / covered : 0,
+        rows: rows
+      };
+    }).sort(function (a, b) {
+      if (b.covered !== a.covered) return b.covered - a.covered;
+      return b.fit - a.fit;
+    });
+  }
+
   /* ---------- matchup brief ---------- */
   function attackPlan(def, offense) {
     var out = [];
@@ -492,6 +556,7 @@
     var sections = SECTIONS.map(function (sec) {
       return buildSection(sec, offense, def, w, rnd, used, plays);
     });
+    var byFormation = buildByFormation(offense, def, w, rngFrom("byform|" + off.id + "|" + def.id + "|" + (seedNum || 0)), plays);
     var passRate = Math.round(offense.style.pass * 100);
     return {
       offense: {
@@ -514,6 +579,7 @@
       expect: expectFrom(def),
       script: script,
       sections: sections,
+      byFormation: byFormation,
       seed: seedNum || 0
     };
   }

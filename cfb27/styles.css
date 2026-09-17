@@ -49,9 +49,13 @@ button.primary:active,button.ghost:active{transform:translateY(1px)}
 /* ---------- tabs / output head ---------- */
 .tabs{display:flex;gap:6px;margin:0 0 12px;background:var(--panel);border:1px solid var(--line);
   border-radius:12px;padding:5px;position:sticky;top:59px;z-index:20}
-.tab{flex:1;padding:10px 6px;border:0;border-radius:9px;background:transparent;color:var(--dim);font-weight:700;font-size:13px}
+.tab{flex:1;padding:10px 4px;border:0;border-radius:9px;background:transparent;color:var(--dim);
+  font-weight:700;font-size:11.5px;white-space:nowrap}
+@media (min-width:560px){.tab{font-size:13px;padding:10px 6px}}
 .tab.on{background:var(--panel2);color:var(--txt);box-shadow:inset 0 0 0 1px var(--line)}
 #out{scroll-margin-top:118px}
+#view-forms{scroll-margin-top:172px}
+.fcard{scroll-margin-top:172px}
 .sheetHead{display:flex;gap:12px;align-items:flex-start;flex-wrap:wrap;margin:0 0 12px}
 .sheetHead h1{font-size:19px;line-height:1.25}
 .actions{display:flex;gap:8px;margin-left:auto;flex-wrap:wrap}
@@ -91,6 +95,23 @@ td.pers{width:52px;text-align:center;color:var(--dim);font-size:11.5px;font-weig
 .t-shot,.t-pa{background:var(--shot)} .t-screen{background:var(--screen)} .t-trick{background:var(--trick)}
 .intent{font-size:11px;text-transform:uppercase;letter-spacing:.9px;color:var(--accent2);font-weight:800}
 .look{font-size:12px;color:#bcd7c4;line-height:1.5;margin-top:3px}
+/* ---------- formation-first sheet ---------- */
+.formJump{position:sticky;top:112px;z-index:15;display:flex;gap:6px;overflow-x:auto;
+  padding:8px;margin:0 0 10px;background:rgba(11,20,16,.96);border:1px solid var(--line);
+  border-radius:12px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.formJump::-webkit-scrollbar{display:none}
+.fchip{flex:0 0 auto;padding:8px 11px;border:1px solid var(--line);border-radius:999px;
+  background:var(--panel2);color:var(--dim);font-size:12px;font-weight:600;white-space:nowrap}
+.fchip.on{background:var(--accent);color:#07150d;border-color:var(--accent)}
+.fchip.clear{color:var(--accent2);border-color:var(--accent2)}
+.fcard.pinned{box-shadow:0 0 0 2px var(--accent)}
+.fcard .cov{font-variant-numeric:tabular-nums}
+td.sit{width:94px;color:var(--accent2);font-size:11.5px;font-weight:700;text-transform:uppercase;
+  letter-spacing:.4px;line-height:1.35}
+td.fcall b{display:block;font-size:13.5px;letter-spacing:.2px}
+td.fcall .dress{color:var(--dim);font-size:11px;margin-top:2px}
+td.fcall .why{color:#9fd8b4;font-size:11px;margin-top:1px}
+td.none{color:#5f7d69;font-size:12px}
 .sheetGrid{display:grid;gap:12px}
 @media (min-width:760px){.sheetGrid{grid-template-columns:1fr 1fr}}
 @media (min-width:1040px){.sheetGrid{grid-template-columns:1fr 1fr 1fr}}
@@ -112,6 +133,10 @@ td.pers{width:52px;text-align:center;color:var(--dim);font-size:11.5px;font-weig
   .bullets li{background:#fff;border:1px solid #bbb;border-left:3px solid #000;
     font-size:8.5pt;padding:4px 6px 4px 20px;margin-bottom:4px;break-inside:avoid}
   .sheetGrid{grid-template-columns:1fr 1fr 1fr;gap:6px}
+  .formJump{display:none}
+  td.sit{width:70px;font-size:6.5pt;color:#000}
+  td.fcall b{font-size:7.5pt} td.fcall .dress,td.fcall .why{font-size:6pt;color:#333}
+  .fcard.pinned{box-shadow:none}
   .block{background:#fff;border:1px solid #666;border-radius:4px;break-inside:avoid;margin-bottom:6px}
   .blockHead{background:#eee;padding:3px 6px}
   .blockHead h3{font-size:8pt} .blockHead p{font-size:6pt}
